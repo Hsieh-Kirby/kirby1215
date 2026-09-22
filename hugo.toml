@@ -1,0 +1,39 @@
+baseURL = 'https://hsieh-kirby.github.io/kirby1215/'
+languageCode = 'zh-TW'
+title = 'Kirby1215'
+defaultContentLanguage = 'zh-tw'
+
+[taxonomies]
+  category = 'categories'
+  tag = 'tags'
+
+[menus]
+  [[menus.main]]
+    name = '首頁'
+    pageRef = '/'
+    weight = 10
+
+  [[menus.main]]
+    name = '生活'
+    url = '/categories/生活/'
+    weight = 20
+
+  [[menus.main]]
+    name = '天理教'
+    url = '/categories/天理教/'
+    weight = 30
+
+  [[menus.main]]
+    name = '音樂'
+    url = '/categories/音樂/'
+    weight = 40
+
+  [[menus.main]]
+    name = '思考'
+    url = '/categories/思考/'
+    weight = 50
+
+  [[menus.main]]
+    name = '關於'
+    url = '/about/'
+    weight = 60

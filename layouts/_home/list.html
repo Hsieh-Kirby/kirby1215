@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ .Site.Title }}</title>
+</head>
+
+<body>
+
+<header>
+    <h1>{{ .Site.Title }}</h1>
+
+    <nav>
+        {{ range .Site.Menus.main }}
+            <a href="{{ .URL }}">{{ .Name }}</a>
+        {{ end }}
+    </nav>
+</header>
+
+<hr>
+
+<main>
+    <h2>最新文章</h2>
+
+    {{ range .Site.RegularPages.ByDate.Reverse }}
+        <article>
+            <p>{{ .Date.Format "2006年01月02日" }}</p>
+
+            <h2>
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            </h2>
+
+            {{ with .Params.category }}
+                <p>分類：{{ . }}</p>
+            {{ end }}
+        </article>
+
+        <hr>
+    {{ end }}
+</main>
+
+</body>
+</html>

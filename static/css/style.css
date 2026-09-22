@@ -1,0 +1,159 @@
+/* Kirby1215 全站基本樣式 */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+    color: #333333;
+    font-family:
+        "Noto Serif TC",
+        "Microsoft JhengHei",
+        "PingFang TC",
+        serif;
+    font-size: 18px;
+    line-height: 1.9;
+}
+
+/* 網站上方 */
+
+header {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 45px 24px 20px;
+}
+
+header h1 {
+    margin: 0 0 22px;
+    font-size: 30px;
+    font-weight: normal;
+}
+
+header h1 a {
+    color: #222222;
+    text-decoration: none;
+}
+
+/* 導覽列 */
+
+nav {
+    padding: 12px 0;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+}
+
+nav a {
+    display: inline-block;
+    margin-right: 24px;
+    color: #333333;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* 主要文章區 */
+
+main {
+    max-width: 760px;
+    margin: 45px auto 80px;
+    padding: 0 24px;
+}
+
+article > h1 {
+    margin-bottom: 8px;
+    color: #222222;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: normal;
+}
+
+article h2 {
+    margin-top: 42px;
+    line-height: 1.5;
+}
+
+/* 正文 */
+
+article p {
+    margin: 0 0 1.5em;
+}
+
+article img {
+    max-width: 100%;
+    height: auto;
+    margin: 25px auto;
+}
+
+/* 連結 */
+
+a {
+    color: #555555;
+}
+
+main a {
+    text-decoration: none;
+}
+
+main a:hover {
+    text-decoration: underline;
+}
+
+/* 分隔線 */
+
+hr {
+    border: 0;
+    border-top: 1px solid #dddddd;
+    margin: 32px 0;
+}
+
+/* 首頁與分類頁的文章標題 */
+
+main article h2 a {
+    color: #222222;
+}
+
+/* 頁尾 */
+
+footer {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 25px 24px 50px;
+    border-top: 1px solid #dddddd;
+    color: #777777;
+    font-size: 14px;
+}
+
+/* 手機 */
+
+@media (max-width: 700px) {
+
+    body {
+        font-size: 17px;
+    }
+
+    header {
+        padding-top: 25px;
+    }
+
+    header h1 {
+        font-size: 26px;
+    }
+
+    nav a {
+        margin-right: 14px;
+        margin-bottom: 5px;
+    }
+
+    main {
+        margin-top: 30px;
+    }
+
+    article > h1 {
+        font-size: 28px;
+    }
+}
