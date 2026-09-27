@@ -121,6 +121,13 @@ a { color: var(--accent-dark); }
 .read-more::after { content: " →"; }
 
 .recent-posts { align-self: start; position: static; padding: 25px 24px; background: var(--sidebar-bg); }
+.visitor-stats { margin-top: 22px; padding: 24px; background: var(--sidebar-bg); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; }
+.visitor-stats h2 { margin: 0 0 15px; font-size: 23px; font-weight: 500; }
+.visitor-stats p { margin: 0; color: var(--muted); font-size: 14px; }
+.visitor-stats dl { margin: 0; }
+.visitor-stats dl div { display: flex; justify-content: space-between; gap: 20px; padding: 10px 0; border-top: 1px solid var(--line); }
+.visitor-stats dt { color: var(--ink); }
+.visitor-stats dd { margin: 0; color: var(--muted); font-weight: 600; }
 .recent-posts h2 { margin: 0 0 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(80, 60, 43, .22); font-size: 23px; font-weight: 500; }
 .recent-filter-label { display: block; margin-bottom: 5px; color: var(--ink); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 13px; }
 .recent-filter { width: 100%; padding: 9px 10px; border: 1px solid rgba(2, 62, 71, .22); border-radius: 2px; background: #fffdf9; color: var(--ink); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 14px; }
@@ -146,6 +153,11 @@ a { color: var(--accent-dark); }
 .article-content img { display: block; max-width: 100%; height: auto; margin: 28px auto; }
 .article-content iframe { max-width: 100%; }
 .article-content a { text-underline-offset: 3px; }
+.article-contact { margin-top: 48px; padding: 24px 26px; border-top: 1px solid var(--line); background: var(--nav-bg); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 15px; }
+.article-contact p { margin: 0 0 14px; }
+.article-contact .contact-email { display: inline-block; margin-right: 14px; padding: 8px 16px; background: var(--accent); color: #fff; text-decoration: none; }
+.article-contact .contact-email:hover { opacity: .86; }
+.article-contact span { color: var(--muted); overflow-wrap: anywhere; }
 
 .taxonomy-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .taxonomy-card { display: flex; justify-content: space-between; gap: 12px; padding: 22px; background: var(--paper-soft); color: var(--ink); text-decoration: none; }

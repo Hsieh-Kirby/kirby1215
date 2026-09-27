@@ -19,6 +19,47 @@
     </ul>
 </aside>
 
+{{ if .IsHome }}
+{{ with .Site.Params.goatcounterCode }}
+<aside class="visitor-stats" data-counter-host="https://{{ . }}.goatcounter.com" aria-label="網站訪客統計">
+    <h2>訪客統計</h2>
+    {{ if hugo.IsServer }}
+    <p>本機預覽不列入統計</p>
+    {{ else }}
+    <dl>
+        <div><dt>累計訪客</dt><dd id="visitor-total">讀取中…</dd></div>
+        <div><dt>今日訪客</dt><dd id="visitor-today">讀取中…</dd></div>
+    </dl>
+    {{ end }}
+</aside>
+{{ if not hugo.IsServer }}
+<script>
+(function () {
+    const box = document.querySelector(".visitor-stats[data-counter-host]");
+    if (!box) return;
+    const base = box.dataset.counterHost + "/counter/" + encodeURIComponent("/site-visitor") + ".json";
+    const today = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Taipei", year: "numeric", month: "2-digit", day: "2-digit"
+    }).format(new Date());
+
+    function loadCount(url, target) {
+        fetch(url)
+            .then(function (response) {
+                if (!response.ok) throw new Error("counter unavailable");
+                return response.json();
+            })
+            .then(function (data) { document.getElementById(target).textContent = data.count; })
+            .catch(function () { document.getElementById(target).textContent = "統計準備中"; });
+    }
+
+    loadCount(base, "visitor-total");
+    loadCount(base + "?start=" + encodeURIComponent(today), "visitor-today");
+})();
+</script>
+{{ end }}
+{{ end }}
+{{ end }}
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const select = document.getElementById("recent-range");

@@ -9,6 +9,7 @@ unsafe = true
 
 [params]
 subtitle = '「智慧主要是一種比例感，更常見的是對我們人類局限性的認識。」—林語堂'
+goatcounterCode = 'kyhsieh'
 
 [taxonomies]
 category = 'categories'

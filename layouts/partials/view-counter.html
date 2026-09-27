@@ -7,4 +7,24 @@
     localStorage.removeItem("kirby1215:view:" + counter.dataset.viewKey);
 })();
 </script>
+{{ else }}
+{{ with .Site.Params.goatcounterCode }}
+<p class="view-counter goatcounter-page-count" data-counter-host="https://{{ . }}.goatcounter.com">
+    觀看次數：<strong>讀取中…</strong>
+</p>
+<script>
+(function () {
+    const counter = document.currentScript.previousElementSibling;
+    if (!counter) return;
+    const url = counter.dataset.counterHost + "/counter/" + encodeURIComponent(window.location.pathname) + ".json";
+    fetch(url)
+        .then(function (response) {
+            if (!response.ok) throw new Error("counter unavailable");
+            return response.json();
+        })
+        .then(function (data) { counter.querySelector("strong").textContent = data.count; })
+        .catch(function () { counter.querySelector("strong").textContent = "統計準備中"; });
+})();
+</script>
+{{ end }}
 {{ end }}

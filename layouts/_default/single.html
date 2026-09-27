@@ -20,6 +20,13 @@
                 {{ partial "view-counter.html" . }}
             </header>
             <div class="article-content">{{ .Content }}</div>
+            {{ if eq .Section "posts" }}
+            <aside class="article-contact" aria-label="聯絡作者">
+                <p>對本文有任何意見，歡迎來信與我分享。</p>
+                <a class="contact-email" href="mailto:0932sya@gmail.com?subject={{ printf "讀者意見：%s" .Title | urlquery }}">寄信給謝科比</a>
+                <span>0932sya@gmail.com</span>
+            </aside>
+            {{ end }}
         </article>
     </main>
     <div class="sidebar-column">

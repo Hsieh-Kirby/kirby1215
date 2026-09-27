@@ -16,3 +16,20 @@
     updateButton();
 })();
 </script>
+{{ with .Site.Params.goatcounterCode }}
+{{ if not hugo.IsServer }}
+<script data-goatcounter="https://{{ . }}.goatcounter.com/count"
+        data-goatcounter-settings='{"no_onload": true}'
+        async src="https://gc.zgo.at/count.js"></script>
+<script>
+(function countVisitWhenReady() {
+    if (!window.goatcounter || !window.goatcounter.count) {
+        window.setTimeout(countVisitWhenReady, 150);
+        return;
+    }
+    window.goatcounter.count();
+    window.goatcounter.count({ path: "/site-visitor", title: "網站訪客" });
+})();
+</script>
+{{ end }}
+{{ end }}
