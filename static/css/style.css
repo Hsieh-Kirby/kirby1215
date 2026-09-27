@@ -217,3 +217,16 @@ a { color: var(--accent-dark); }
     .single-article { padding-left: 3px; padding-right: 3px; }
     .back-to-top { right: 14px; bottom: 16px; width: 38px; height: 38px; font-size: 19px; line-height: 36px; }
 }
+.about-hero {
+  height: min(32rem, 52vw);
+  margin: 0 0 2rem;
+  overflow: hidden;
+}
+
+.about-hero img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center bottom;
+}
