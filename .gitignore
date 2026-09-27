@@ -2,3 +2,6 @@ public/
 resources/
 .hugo_build.lock
 website.zip
+.tmp-image-compression-test/
+migration-backups/
+migration-logs/

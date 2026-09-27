@@ -1,0 +1,18 @@
+<footer class="site-footer"><p>© {{ now.Year }} 謝科比的大雜把園地</p></footer>
+<button class="back-to-top" id="back-to-top" type="button" aria-label="回到頁面最上面" title="回到最上面">↑</button>
+<script>
+(function () {
+    const button = document.getElementById("back-to-top");
+    if (!button) return;
+
+    function updateButton() {
+        button.classList.toggle("is-visible", window.scrollY > 500);
+    }
+
+    button.addEventListener("click", function () {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    window.addEventListener("scroll", updateButton, { passive: true });
+    updateButton();
+})();
+</script>

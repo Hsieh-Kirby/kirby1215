@@ -1,0 +1,30 @@
+{{- $featured := "" -}}
+{{- with .Params.cover -}}
+    {{- $featured = strings.TrimPrefix "/kirby1215/" . -}}
+    {{- $featured = strings.TrimPrefix "/" $featured -}}
+{{- end -}}
+{{- with .Params.wordpress_post_id -}}
+    {{- if eq $featured "" -}}
+    {{- $postID := . -}}
+    {{- range slice "jpg" "jpeg" "png" "webp" "gif" -}}
+        {{- $staticPath := printf "static/images/wordpress/wp-%v/featured.%s" $postID . -}}
+        {{- if fileExists $staticPath -}}
+            {{- $featured = printf "images/wordpress/wp-%v/featured.%s" $postID . -}}
+        {{- end -}}
+    {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- if eq $featured "" -}}
+    {{- with findRE `(?m)^!\[[^\]]*\]\([^)]+\)` .RawContent 1 -}}
+        {{- $featured = replaceRE `^!\[[^\]]*\]\(([^)]+)\)$` "$1" (index . 0) -}}
+        {{- $featured = strings.TrimPrefix "<" $featured -}}
+        {{- $featured = strings.TrimSuffix ">" $featured -}}
+        {{- $featured = strings.TrimPrefix "/kirby1215/" $featured -}}
+        {{- $featured = strings.TrimPrefix "/" $featured -}}
+    {{- end -}}
+{{- end -}}
+{{- with $featured -}}
+<a class="post-thumbnail" href="{{ $.RelPermalink }}" aria-label="閱讀：{{ $.Title }}">
+    <img src="{{ . | relURL }}" alt="{{ $.Title }}" loading="lazy">
+</a>
+{{- end -}}

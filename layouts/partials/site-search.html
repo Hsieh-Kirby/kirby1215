@@ -1,0 +1,75 @@
+{{- $searchIndex := slice -}}
+{{- range (where .Site.RegularPages "Section" "posts") -}}
+    {{- $searchIndex = $searchIndex | append (dict
+        "title" .Title
+        "url" .RelPermalink
+        "date" (.Date.Format "2006年01月02日")
+        "categories" .Params.categories
+        "content" (.Plain | plainify)
+    ) -}}
+{{- end -}}
+<section class="site-search" aria-label="文章搜尋">
+    <label for="article-search">搜尋文章</label>
+    <div class="search-row">
+        <input id="article-search" type="search" placeholder="輸入標題或關鍵字" autocomplete="off">
+        <button id="article-search-button" type="button">搜尋</button>
+    </div>
+    <p class="search-status" id="search-status" aria-live="polite"></p>
+    <div class="search-results" id="search-results" hidden></div>
+</section>
+
+<script>
+(function () {
+    const posts = {{ $searchIndex | jsonify | safeJS }};
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const input = document.getElementById("article-search");
+        const button = document.getElementById("article-search-button");
+        const status = document.getElementById("search-status");
+        const results = document.getElementById("search-results");
+        if (!input || !button || !status || !results) return;
+
+        function escapeHTML(value) {
+            const node = document.createElement("div");
+            node.textContent = value;
+            return node.innerHTML;
+        }
+
+        function runSearch() {
+            const keyword = input.value.trim().toLocaleLowerCase("zh-TW");
+            if (!keyword) {
+                status.textContent = "";
+                results.hidden = true;
+                results.innerHTML = "";
+                return;
+            }
+
+            const matched = posts.filter(function (post) {
+                const categories = Array.isArray(post.categories) ? post.categories.join(" ") : "";
+                return (post.title + " " + categories + " " + post.content)
+                    .toLocaleLowerCase("zh-TW")
+                    .includes(keyword);
+            });
+
+            status.textContent = "找到 " + matched.length + " 篇文章";
+            results.innerHTML = matched.slice(0, 30).map(function (post) {
+                return '<a href="' + post.url + '"><strong>' + escapeHTML(post.title) +
+                    '</strong><span>' + escapeHTML(post.date) + '</span></a>';
+            }).join("");
+            if (matched.length > 30) {
+                results.innerHTML += '<p class="search-more">先顯示前 30 篇，請輸入更精確的關鍵字。</p>';
+            }
+            results.hidden = false;
+        }
+
+        button.addEventListener("click", runSearch);
+        input.addEventListener("input", runSearch);
+        input.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                input.value = "";
+                runSearch();
+            }
+        });
+    });
+})();
+</script>

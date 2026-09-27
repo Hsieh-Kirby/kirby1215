@@ -1,0 +1,10 @@
+{{ if hugo.IsServer }}
+<p class="view-counter" data-view-key="{{ .RelPermalink }}">觀看次數：本機預覽不計入</p>
+<script>
+(function () {
+    const counter = document.currentScript.previousElementSibling;
+    if (!counter) return;
+    localStorage.removeItem("kirby1215:view:" + counter.dataset.viewKey);
+})();
+</script>
+{{ end }}

@@ -1,0 +1,50 @@
+<aside class="recent-posts" aria-label="近期文章">
+    <h2>近期文章</h2>
+    <label class="recent-filter-label" for="recent-range">顯示範圍</label>
+    <select class="recent-filter" id="recent-range">
+        <option value="3" selected>最近 3 個月</option>
+        <option value="6">最近 6 個月</option>
+        <option value="12">最近 1 年</option>
+        <option value="36">最近 3 年</option>
+        <option value="all">全部文章</option>
+    </select>
+    <p class="recent-result" id="recent-result" aria-live="polite"></p>
+    <ul id="recent-list">
+        {{ range (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+            <li data-date="{{ .Date.Format "2006-01-02" }}">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+            </li>
+        {{ end }}
+    </ul>
+</aside>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const select = document.getElementById("recent-range");
+    const list = document.getElementById("recent-list");
+    const result = document.getElementById("recent-result");
+    if (!select || !list || !result) return;
+
+    const items = Array.from(list.querySelectorAll("li[data-date]"));
+
+    function filterRecentPosts() {
+        const range = select.value;
+        const cutoff = new Date();
+        if (range !== "all") cutoff.setMonth(cutoff.getMonth() - Number(range));
+
+        let visible = 0;
+        items.forEach(function (item) {
+            const published = new Date(item.dataset.date + "T00:00:00");
+            const show = range === "all" || published >= cutoff;
+            item.hidden = !show;
+            if (show) visible += 1;
+        });
+
+        result.textContent = "共 " + visible + " 篇";
+    }
+
+    select.addEventListener("change", filterRecentPosts);
+    filterRecentPosts();
+});
+</script>

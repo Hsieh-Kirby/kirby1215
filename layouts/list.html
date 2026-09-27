@@ -1,45 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ .Site.Title }}</title>
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
-
 <body>
-
-<header>
-    <h1>{{ .Site.Title }}</h1>
-
-    <nav>
-        {{ range .Site.Menus.main }}
-            <a href="{{ .URL }}">{{ .Name }}</a>
+{{ partial "site-header.html" . }}
+<div class="page-layout">
+    <main class="article-main">
+        <h1 class="page-title">最新文章</h1>
+        <div class="post-list">
+        {{ range (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
+            <article class="post-card">
+                {{ partial "featured-image.html" . }}
+                <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+                <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+                {{ with .Params.categories }}<p class="post-categories">分類：{{ delimit . "、" }}</p>{{ end }}
+                <p class="post-summary">{{ .Summary | plainify | truncate 150 }}</p>
+                <a class="read-more" href="{{ .RelPermalink }}">繼續閱讀</a>
+            </article>
         {{ end }}
-    </nav>
-</header>
-
-<hr>
-
-<main>
-    <h2>最新文章</h2>
-
-    {{ range .Site.RegularPages.ByDate.Reverse }}
-        <article>
-            <p>{{ .Date.Format "2006年01月02日" }}</p>
-
-            <h2>
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-            </h2>
-
-            {{ with .Params.category }}
-                <p>分類：{{ . }}</p>
-            {{ end }}
-        </article>
-
-        <hr>
-    {{ end }}
-</main>
-
+        </div>
+    </main>
+    <div class="sidebar-column">
+        {{ partial "site-search.html" . }}
+        {{ partial "sidebar.html" . }}
+    </div>
+</div>
+{{ partial "site-footer.html" . }}
 </body>
 </html>

@@ -1,55 +1,32 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ .Title }}｜{{ .Site.Title }}</title>
     <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
 </head>
-
 <body>
-
-<header>
-    <h1><a href="{{ .Site.Home.RelPermalink }}">{{ .Site.Title }}</a></h1>
-
-    <nav>
-        {{ range .Site.Menus.main }}
-            <a href="{{ .URL }}">{{ .Name }}</a>
-        {{ end }}
-    </nav>
-</header>
-
-<hr>
-
-<main>
-
-    <article>
-
-        <h1>{{ .Title }}</h1>
-
-        <p>
-            {{ .Date.Format "2006年01月02日" }}
-            {{ with .Params.category }}
-                ｜ {{ . }}
-            {{ end }}
-        </p>
-
-        <hr>
-
-        <div>
-            {{ .Content }}
-        </div>
-
-    </article>
-
-</main>
-
-<hr>
-
-<footer>
-    <p>© Kirby1215</p>
-</footer>
-
+{{ partial "site-header.html" . }}
+<div class="page-layout">
+    <main class="article-main">
+        <article class="single-article">
+            <header class="article-header">
+                <h1>{{ .Title }}</h1>
+                <p class="article-meta">
+                    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+                    {{ with .Params.categories }}<span>分類：{{ delimit . "、" }}</span>{{ end }}
+                </p>
+                {{ partial "view-counter.html" . }}
+            </header>
+            <div class="article-content">{{ .Content }}</div>
+        </article>
+    </main>
+    <div class="sidebar-column">
+        {{ partial "site-search.html" . }}
+        {{ partial "sidebar.html" . }}
+    </div>
+</div>
+{{ partial "site-footer.html" . }}
 </body>
 </html>
