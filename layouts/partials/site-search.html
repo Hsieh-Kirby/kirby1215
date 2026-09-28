@@ -5,6 +5,7 @@
         "url" .RelPermalink
         "date" (.Date.Format "2006年01月02日")
         "categories" .Params.categories
+        "series" .Params.series
         "content" (.Plain | plainify)
     ) -}}
 {{- end -}}
@@ -46,7 +47,8 @@
 
             const matched = posts.filter(function (post) {
                 const categories = Array.isArray(post.categories) ? post.categories.join(" ") : "";
-                return (post.title + " " + categories + " " + post.content)
+                const series = Array.isArray(post.series) ? post.series.join(" ") : "";
+                return (post.title + " " + categories + " " + series + " " + post.content)
                     .toLocaleLowerCase("zh-TW")
                     .includes(keyword);
             });

@@ -14,6 +14,7 @@ goatcounterCode = 'kyhsieh'
 [taxonomies]
 category = 'categories'
 tag = 'tags'
+series = 'series'
 
 [permalinks]
 posts = '/:year/:month/:day/:slug/'
@@ -44,6 +45,11 @@ weight = 40
 name = '思考'
 url = '/categories/思考/'
 weight = 50
+
+[[menus.main]]
+name = '專題'
+url = '/series/'
+weight = 55
 
 [[menus.main]]
 name = '關於'

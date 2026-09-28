@@ -37,7 +37,7 @@ function Add-ActionButton([string]$Text, [int]$Y, [string]$ScriptName) {
 Add-ActionButton "新增文章" 112 "article-editor.ps1"
 Add-ActionButton "編輯已發布文章" 168 "edit-article.ps1"
 Add-ActionButton "刪除文章與專用圖片" 224 "delete-article.ps1"
-Add-ActionButton "批次修改文章分類" 280 "bulk-category.ps1"
+Add-ActionButton "批次修改分類與專題" 280 "bulk-category.ps1"
 Add-ActionButton "發布網站到 GitHub" 336 "publish-site.ps1"
 
 $exitButton = New-Object System.Windows.Forms.Button

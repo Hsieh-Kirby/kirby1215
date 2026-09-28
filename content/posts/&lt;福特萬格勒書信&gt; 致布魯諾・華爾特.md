@@ -5,6 +5,8 @@ slug: "福特萬格勒書信-致布魯諾・華爾特"
 date: "2024-04-16 08:00:00"
 categories:
   - "音樂"
+series:
+  - "福特萬格勒"
 original_categories:
   - "短文翻譯"
   - "福特萬格勒"

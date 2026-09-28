@@ -11,8 +11,35 @@
 <div class="page-layout">
     <main class="article-main">
         <h1 class="page-title">{{ .Title }}</h1>
-        <div class="post-list">
-        {{ range .Pages.ByDate.Reverse }}
+
+        {{ if eq .Data.Singular "category" }}
+        {{ $category := .Title }}
+        <section class="related-series" aria-label="本分類的專題">
+            <h2>相關專題</h2>
+            <div class="series-links">
+            {{ range .Site.Taxonomies.series.ByCount }}
+                {{ $matched := where .Pages "Params.categories" "intersect" (slice $category) }}
+                {{ if gt (len $matched) 0 }}
+                <a href="{{ .Page.RelPermalink }}"><span>{{ .Page.LinkTitle }}</span><small>{{ len $matched }} 篇</small></a>
+                {{ end }}
+            {{ end }}
+            </div>
+        </section>
+        {{ end }}
+
+        {{ if eq .Data.Singular "series" }}
+        <section class="series-intro">
+            <p>本頁收錄「{{ .Title }}」專題文章，依日期由新到舊排列。</p>
+            <label for="series-filter">搜尋本專題</label>
+            <input id="series-filter" type="search" placeholder="輸入文章標題或內容關鍵字" autocomplete="off">
+            <p id="series-filter-status" class="series-filter-status" aria-live="polite"></p>
+            <div id="series-search-results" class="series-search-results" hidden></div>
+        </section>
+        {{ end }}
+
+        {{ $paginator := .Paginate (.Pages.ByDate.Reverse) 10 }}
+        <div class="post-list" id="series-post-list">
+        {{ range $paginator.Pages }}
             <article class="post-card">
                 {{ partial "featured-image.html" . }}
                 <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
@@ -22,6 +49,14 @@
             </article>
         {{ end }}
         </div>
+
+        {{ if gt $paginator.TotalPages 1 }}
+        <nav class="pagination" aria-label="文章分頁">
+            {{ with $paginator.Prev }}<a href="{{ .URL }}">← 上一頁</a>{{ end }}
+            <span>第 {{ $paginator.PageNumber }}／{{ $paginator.TotalPages }} 頁</span>
+            {{ with $paginator.Next }}<a href="{{ .URL }}">下一頁 →</a>{{ end }}
+        </nav>
+        {{ end }}
     </main>
     <div class="sidebar-column">
         {{ partial "site-search.html" . }}
@@ -29,5 +64,49 @@
     </div>
 </div>
 {{ partial "site-footer.html" . }}
+{{ if eq .Data.Singular "series" }}
+{{ $seriesSearchIndex := slice }}
+{{ range .Pages.ByDate.Reverse }}
+    {{ $seriesSearchIndex = $seriesSearchIndex | append (dict "title" .Title "url" .RelPermalink "date" (.Date.Format "2006年01月02日") "content" (.Plain | plainify)) }}
+{{ end }}
+<script>
+(function () {
+    const posts = {{ $seriesSearchIndex | jsonify | safeJS }};
+    const input = document.getElementById("series-filter");
+    const status = document.getElementById("series-filter-status");
+    const results = document.getElementById("series-search-results");
+    const list = document.getElementById("series-post-list");
+    const pagination = document.querySelector(".pagination");
+    if (!input || !status || !results || !list) return;
+    function escapeHTML(value) {
+        const node = document.createElement("div");
+        node.textContent = value;
+        return node.innerHTML;
+    }
+    input.addEventListener("input", function () {
+        const keyword = input.value.trim().toLocaleLowerCase("zh-TW");
+        if (!keyword) {
+            status.textContent = "";
+            results.hidden = true;
+            results.innerHTML = "";
+            list.hidden = false;
+            if (pagination) pagination.hidden = false;
+            return;
+        }
+        const matched = posts.filter(function (post) {
+            return (post.title + " " + post.content).toLocaleLowerCase("zh-TW").includes(keyword);
+        });
+        status.textContent = "整個專題找到 " + matched.length + " 篇文章";
+        results.innerHTML = matched.map(function (post) {
+            return '<a href="' + post.url + '"><strong>' + escapeHTML(post.title) + '</strong><span>' + escapeHTML(post.date) + '</span></a>';
+        }).join("");
+        if (!matched.length) results.innerHTML = '<p>沒有符合的文章。</p>';
+        results.hidden = false;
+        list.hidden = true;
+        if (pagination) pagination.hidden = true;
+    });
+})();
+</script>
+{{ end }}
 </body>
 </html>

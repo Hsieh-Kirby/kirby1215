@@ -16,6 +16,9 @@
                 <p class="article-meta">
                     <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
                     {{ with .Params.categories }}<span>分類：{{ delimit . "、" }}</span>{{ end }}
+                    {{ with .GetTerms "series" }}
+                    <span>專題：{{ range $index, $term := . }}{{ if $index }}、{{ end }}<a href="{{ $term.RelPermalink }}">{{ $term.LinkTitle }}</a>{{ end }}</span>
+                    {{ end }}
                 </p>
                 {{ partial "view-counter.html" . }}
             </header>

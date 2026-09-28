@@ -1,9 +1,10 @@
-Add-Type -AssemblyName System.Windows.Forms
+﻿Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
 $Categories = @("生活", "音樂", "天理教", "思考")
+$SeriesChoices = @("無專題", "福特萬格勒", "克倫培勒", "福特萬格勒、克倫培勒", "松本滋")
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 function Split-Post([string]$Text) {
@@ -39,6 +40,27 @@ function Set-Category([string]$FrontMatter, [string]$Category) {
     return $FrontMatter.TrimEnd() + "`r`n" + $block
 }
 
+function Get-Series([string]$FrontMatter) {
+    $match = [regex]::Match($FrontMatter, '(?ms)^series:\s*\r?\n((?:\s+-[^\r\n]*\r?\n?)*)')
+    if (-not $match.Success) { return '無專題' }
+    $items = @([regex]::Matches($match.Groups[1].Value, '(?m)^\s+-\s*["'']?([^"''\r\n]+)') | ForEach-Object { $_.Groups[1].Value.Trim() })
+    if ($items.Count -eq 0) { return '無專題' }
+    return ($items -join '、')
+}
+
+function Set-Series([string]$FrontMatter, [string]$Series) {
+    $pattern = '(?ms)^series:\s*\r?\n(?:\s+-[^\r\n]*\r?\n?)*'
+    if ($Series -eq '無專題' -or [string]::IsNullOrWhiteSpace($Series)) {
+        return [regex]::Replace($FrontMatter, $pattern, '', 1).TrimEnd()
+    }
+    $lines = @($Series -split '、' | ForEach-Object { '  - "' + $_.Trim() + '"' })
+    $block = "series:`r`n" + ($lines -join "`r`n")
+    if ([regex]::IsMatch($FrontMatter, $pattern)) {
+        return [regex]::Replace($FrontMatter, $pattern, $block + "`r`n", 1)
+    }
+    return $FrontMatter.TrimEnd() + "`r`n" + $block
+}
+
 $script:AllPosts = @()
 Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
     try {
@@ -51,6 +73,8 @@ Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
             Title = $title
             Category = Get-Category $parts.FrontMatter
             OriginalCategory = Get-Category $parts.FrontMatter
+            Series = Get-Series $parts.FrontMatter
+            OriginalSeries = Get-Series $parts.FrontMatter
             Path = $_.FullName
         }
     } catch { }
@@ -58,8 +82,8 @@ Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
 $script:AllPosts = @($script:AllPosts | Sort-Object Date -Descending)
 
 $form = New-Object System.Windows.Forms.Form
-$form.Text = 'Kirby1215 批次修改分類'
-$form.Size = New-Object System.Drawing.Size(1000, 760)
+$form.Text = 'Kirby1215 批次修改分類與專題'
+$form.Size = New-Object System.Drawing.Size(1120, 760)
 $form.MinimumSize = New-Object System.Drawing.Size(820, 620)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object System.Drawing.Font('Microsoft JhengHei', 10)
@@ -82,27 +106,41 @@ $searchButton.Size = New-Object System.Drawing.Size(95, 34)
 $form.Controls.Add($searchButton)
 
 $bulkBox = New-Object System.Windows.Forms.ComboBox
-$bulkBox.Location = New-Object System.Drawing.Point(480, 50)
-$bulkBox.Size = New-Object System.Drawing.Size(130, 28)
+$bulkBox.Location = New-Object System.Drawing.Point(390, 50)
+$bulkBox.Size = New-Object System.Drawing.Size(110, 28)
 $bulkBox.DropDownStyle = 'DropDownList'
 [void]$bulkBox.Items.AddRange($Categories)
 $bulkBox.SelectedIndex = 0
 $form.Controls.Add($bulkBox)
 
 $bulkButton = New-Object System.Windows.Forms.Button
-$bulkButton.Text = '套用到選取文章'
-$bulkButton.Location = New-Object System.Drawing.Point(620, 47)
-$bulkButton.Size = New-Object System.Drawing.Size(155, 34)
+$bulkButton.Text = '套用分類'
+$bulkButton.Location = New-Object System.Drawing.Point(508, 47)
+$bulkButton.Size = New-Object System.Drawing.Size(105, 34)
 $form.Controls.Add($bulkButton)
 
+$bulkSeriesBox = New-Object System.Windows.Forms.ComboBox
+$bulkSeriesBox.Location = New-Object System.Drawing.Point(630, 50)
+$bulkSeriesBox.Size = New-Object System.Drawing.Size(175, 28)
+$bulkSeriesBox.DropDownStyle = 'DropDownList'
+[void]$bulkSeriesBox.Items.AddRange($SeriesChoices)
+$bulkSeriesBox.SelectedIndex = 0
+$form.Controls.Add($bulkSeriesBox)
+
+$bulkSeriesButton = New-Object System.Windows.Forms.Button
+$bulkSeriesButton.Text = '套用專題'
+$bulkSeriesButton.Location = New-Object System.Drawing.Point(813, 47)
+$bulkSeriesButton.Size = New-Object System.Drawing.Size(105, 34)
+$form.Controls.Add($bulkSeriesButton)
+
 $countLabel = New-Object System.Windows.Forms.Label
-$countLabel.Location = New-Object System.Drawing.Point(790, 55)
+$countLabel.Location = New-Object System.Drawing.Point(930, 55)
 $countLabel.Size = New-Object System.Drawing.Size(170, 25)
 $form.Controls.Add($countLabel)
 
 $grid = New-Object System.Windows.Forms.DataGridView
 $grid.Location = New-Object System.Drawing.Point(18, 92)
-$grid.Size = New-Object System.Drawing.Size(945, 555)
+$grid.Size = New-Object System.Drawing.Size(1065, 555)
 $grid.Anchor = 'Top,Bottom,Left,Right'
 $grid.AllowUserToAddRows = $false
 $grid.AllowUserToDeleteRows = $false
@@ -135,6 +173,14 @@ $categoryCol.FlatStyle = 'Flat'
 [void]$categoryCol.Items.AddRange($Categories)
 [void]$grid.Columns.Add($categoryCol)
 
+$seriesCol = New-Object System.Windows.Forms.DataGridViewComboBoxColumn
+$seriesCol.HeaderText = '專題'
+$seriesCol.Name = 'Series'
+$seriesCol.Width = 185
+$seriesCol.FlatStyle = 'Flat'
+[void]$seriesCol.Items.AddRange($SeriesChoices)
+[void]$grid.Columns.Add($seriesCol)
+
 function Load-Grid([string]$Keyword) {
     $grid.Rows.Clear()
     $items = $script:AllPosts
@@ -143,7 +189,8 @@ function Load-Grid([string]$Keyword) {
     }
     foreach ($post in $items) {
         $category = if ($Categories -contains $post.Category) { $post.Category } else { '生活' }
-        $index = $grid.Rows.Add($post.Date, $post.Title, $category)
+        $series = if ($SeriesChoices -contains $post.Series) { $post.Series } else { '無專題' }
+        $index = $grid.Rows.Add($post.Date, $post.Title, $category, $series)
         $grid.Rows[$index].Tag = $post
     }
     $countLabel.Text = "顯示 $($grid.Rows.Count) 篇"
@@ -157,6 +204,21 @@ $grid.Add_CellValueChanged({
     if ($eventArgs.RowIndex -ge 0 -and $eventArgs.ColumnIndex -eq $grid.Columns['Category'].Index) {
         $row = $grid.Rows[$eventArgs.RowIndex]
         if ($row.Tag) { $row.Tag.Category = [string]$row.Cells['Category'].Value }
+    }
+    if ($eventArgs.RowIndex -ge 0 -and $eventArgs.ColumnIndex -eq $grid.Columns['Series'].Index) {
+        $row = $grid.Rows[$eventArgs.RowIndex]
+        if ($row.Tag) { $row.Tag.Series = [string]$row.Cells['Series'].Value }
+    }
+})
+
+$bulkSeriesButton.Add_Click({
+    if ($grid.SelectedRows.Count -eq 0) {
+        [System.Windows.Forms.MessageBox]::Show('請先選取一篇或多篇文章。', '批次修改專題', 'OK', 'Information') | Out-Null
+        return
+    }
+    foreach ($row in $grid.SelectedRows) {
+        $row.Cells['Series'].Value = [string]$bulkSeriesBox.SelectedItem
+        if ($row.Tag) { $row.Tag.Series = [string]$bulkSeriesBox.SelectedItem }
     }
 })
 $grid.Add_CurrentCellDirtyStateChanged({ if ($grid.IsCurrentCellDirty) { $grid.CommitEdit('Commit') } })
@@ -188,7 +250,7 @@ $exitButton.Add_Click({ $form.Close() })
 $form.Controls.Add($exitButton)
 
 $saveButton.Add_Click({
-    $changed = @($script:AllPosts | Where-Object { $_.Category -ne $_.OriginalCategory })
+    $changed = @($script:AllPosts | Where-Object { $_.Category -ne $_.OriginalCategory -or $_.Series -ne $_.OriginalSeries })
     if ($changed.Count -eq 0) {
         [System.Windows.Forms.MessageBox]::Show('目前沒有分類變更。', '批次修改分類', 'OK', 'Information') | Out-Null
         return
@@ -201,9 +263,11 @@ $saveButton.Add_Click({
             $raw = [System.IO.File]::ReadAllText($post.Path)
             $parts = Split-Post $raw
             $frontMatter = Set-Category $parts.FrontMatter $post.Category
+            $frontMatter = Set-Series $frontMatter $post.Series
             $updated = "---`r`n$frontMatter`r`n---`r`n`r`n" + $parts.Body.TrimStart("`r", "`n")
             [System.IO.File]::WriteAllText($post.Path, $updated, $Utf8NoBom)
             $post.OriginalCategory = $post.Category
+            $post.OriginalSeries = $post.Series
         }
         [System.Windows.Forms.MessageBox]::Show("已修改 $($changed.Count) 篇文章。`r`n原檔備份：$backupRoot", '批次修改分類', 'OK', 'Information') | Out-Null
     } catch {

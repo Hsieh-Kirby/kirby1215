@@ -4,6 +4,8 @@ slug: "erno-balogh回憶福特萬格勒時間約於1965年"
 date: "2025-12-09 23:41:18"
 categories:
   - "音樂"
+series:
+  - "福特萬格勒"
 original_categories:
   - "福特萬格勒"
   - "音樂"
