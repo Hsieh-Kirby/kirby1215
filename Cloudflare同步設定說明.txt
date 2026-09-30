@@ -1,0 +1,27 @@
+Kirby1215：GitHub 與 Cloudflare Pages 同步發布
+================================================
+
+第一次設定
+----------
+1. 雙擊「Cloudflare同步設定_點這個.cmd」。
+2. 按照視窗內容，在 Cloudflare Pages 連接 GitHub repository：
+   Hsieh-Kirby/kirby1215
+3. 建置設定：
+   Production branch：main
+   Build command：hugo --gc --minify -b $CF_PAGES_URL
+   Build output directory：public
+   Root directory：留白
+4. Environment variables：
+   HUGO_VERSION = 0.166.0
+5. 按 Save and Deploy，等待第一次建置完成。
+
+日常發布
+--------
+以後只要雙擊「發布到GitHub與Cloudflare.cmd」。
+工具會先檢查 Hugo 網站，再上傳 GitHub。GitHub Pages 會更新，Cloudflare Pages
+也會因 GitHub 的新版本而自動建置，不需要再次手動上傳。
+
+說明
+----
+Cloudflare 的 GitHub 授權必須由網站擁有者本人在瀏覽器中完成。
+GitHub Pages 與 Cloudflare Pages 會有不同網址，但內容來自同一份 GitHub 原稿。

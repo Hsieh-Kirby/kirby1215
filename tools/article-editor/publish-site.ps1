@@ -40,7 +40,7 @@ try {
     if (-not $git) { throw "找不到 Git，無法發布到 GitHub。" }
 
     $answer = [Windows.Forms.MessageBox]::Show(
-        "即將檢查網站並發布到 GitHub。要繼續嗎？",
+        "即將檢查網站並發布到 GitHub。`r`n`r`n如果已完成 Cloudflare Pages 同步設定，這次上傳也會自動更新 Cloudflare。要繼續嗎？",
         "確認發布",
         "YesNo",
         "Question"
@@ -55,7 +55,7 @@ try {
 
         $changes = (& $git status --short) -join "`r`n"
         if ([string]::IsNullOrWhiteSpace($changes)) {
-            Show-Message "目前沒有需要發布的新變更。"
+            Show-Message "目前沒有需要發布的新變更。`r`n`r`nGitHub 與 Cloudflare 不會重新建置。"
             return
         }
 
@@ -68,7 +68,7 @@ try {
         & $git push origin main
         if ($LASTEXITCODE -ne 0) { throw "GitHub 上傳失敗；本機內容仍安全保留。" }
 
-        Show-Message "網站已成功發布到 GitHub。"
+        Show-Message "網站已成功上傳 GitHub。`r`n`r`nGitHub Pages 正在更新。若 Cloudflare Pages 已連接此 GitHub repository，Cloudflare 也會自動開始建置，通常幾分鐘後完成。"
     } finally { Pop-Location }
 } catch {
     Show-Message ("發布失敗：`r`n" + $_.Exception.Message) "Error"
