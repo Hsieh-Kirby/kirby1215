@@ -4,7 +4,7 @@ date: 2026-09-24
 ---
 
 <figure class="about-hero">
-  <img src="/kirby1215/images/about-hualien.jpg" alt="花蓮海岸">
+  <img src="../images/about-hualien.jpg" alt="花蓮海岸">
 </figure>
 
 花蓮人。學生時期學習物理想當科學家，後來發現「生活」本身更值得用心追求。曾經在日本生活9年，期間攻讀分析哲學。喜歡旅行、聽音樂、閱讀。目前任職於軟體公司。

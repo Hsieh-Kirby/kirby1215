@@ -1,0 +1,8 @@
+{{- $source := .Destination -}}
+{{- $isRemote := or (strings.HasPrefix $source "http://") (strings.HasPrefix $source "https://") -}}
+{{- if not $isRemote -}}
+    {{- $source = strings.TrimPrefix "/kirby1215/" $source -}}
+    {{- $source = strings.TrimPrefix "/" $source -}}
+    {{- $source = $source | relURL -}}
+{{- end -}}
+<img src="{{ $source | safeURL }}" alt="{{ .Text }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy">
