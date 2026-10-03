@@ -200,7 +200,7 @@ $deleteButton.Add_Click({
         }
 
         Move-Item -LiteralPath $selected.Path -Destination (Join-Path $postBackup ([System.IO.Path]::GetFileName($selected.Path)))
-        Show-Info "文章已從網站移除並完成備份。`r`n`r`n備份位置：`r`n$backupRoot`r`n`r`n下次發布到 GitHub 時，線上文章才會同步刪除。"
+        Show-Info "文章已從本機網站移除並完成備份。`r`n`r`n備份位置：`r`n$backupRoot`r`n`r`n回到網站管理介面執行發布後，Cloudflare 線上文章才會同步刪除。"
         Load-Posts
         $detailsBox.Clear()
     } catch {

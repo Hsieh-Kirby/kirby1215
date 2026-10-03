@@ -1,0 +1,8 @@
+# 舊 WordPress 固定頁面與分類網址
+/簡介/                  /about/               301
+/category/生活/         /categories/生活/     301
+/category/音樂/         /categories/音樂/     301
+/category/日本/         /categories/生活/     301
+
+# 舊 WordPress 常用入口
+/feed/                  /index.xml            301

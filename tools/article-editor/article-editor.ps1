@@ -192,12 +192,43 @@ function Add-Log([string]$Message) {
     $logBox.ScrollToCaret()
 }
 
+function Show-DraftImagePreview([string]$ImagePath) {
+    if ($draftPreviewPicture.Image) {
+        $oldImage = $draftPreviewPicture.Image
+        $draftPreviewPicture.Image = $null
+        $oldImage.Dispose()
+    }
+    if ([string]::IsNullOrWhiteSpace($ImagePath) -or -not (Test-Path -LiteralPath $ImagePath -PathType Leaf)) {
+        $draftPreviewMessage.Text = "尚未選擇圖片"
+        return
+    }
+    try {
+        $loaded = [System.Drawing.Image]::FromFile($ImagePath)
+        try { $draftPreviewPicture.Image = New-Object System.Drawing.Bitmap($loaded) } finally { $loaded.Dispose() }
+        $draftPreviewMessage.Text = [System.IO.Path]::GetFileName($ImagePath)
+    } catch {
+        $draftPreviewMessage.Text = "此格式儲存後可在網頁預覽"
+    }
+}
+
+function Refresh-DraftImageList {
+    $draftImageList.Items.Clear()
+    if ($script:CoverFile) {
+        [void]$draftImageList.Items.Add([pscustomobject]@{ Display = "封面：$([System.IO.Path]::GetFileName($script:CoverFile))"; Path = [string]$script:CoverFile })
+    }
+    for ($i = 0; $i -lt $script:BodyImages.Count; $i++) {
+        $path = [string]$script:BodyImages[$i]
+        [void]$draftImageList.Items.Add([pscustomobject]@{ Display = "內文 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
+    }
+    if ($draftImageList.Items.Count -gt 0 -and $draftImageList.SelectedIndex -lt 0) { $draftImageList.SelectedIndex = 0 }
+}
+
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Kirby1215 新增文章"
-$form.Size = New-Object System.Drawing.Size(1030, 790)
+$form.Size = New-Object System.Drawing.Size(1320, 790)
 $form.StartPosition = "CenterScreen"
 $form.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 10)
-$form.MinimumSize = New-Object System.Drawing.Size(900, 700)
+$form.MinimumSize = New-Object System.Drawing.Size(1180, 700)
 
 $titleLabel = New-Object System.Windows.Forms.Label
 $titleLabel.Text = "文章標題"
@@ -286,6 +317,37 @@ $contentBox.AcceptsTab = $true
 $contentBox.WordWrap = $true
 $form.Controls.Add($contentBox)
 
+$draftPreviewTitle = New-Object System.Windows.Forms.Label
+$draftPreviewTitle.Text = "插入圖片預覽"
+$draftPreviewTitle.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 11, [System.Drawing.FontStyle]::Bold)
+$draftPreviewTitle.Location = New-Object System.Drawing.Point(1010, 150)
+$draftPreviewTitle.Size = New-Object System.Drawing.Size(260, 28)
+$draftPreviewTitle.Anchor = "Top,Right"
+$form.Controls.Add($draftPreviewTitle)
+
+$draftImageList = New-Object System.Windows.Forms.ListBox
+$draftImageList.Location = New-Object System.Drawing.Point(1010, 182)
+$draftImageList.Size = New-Object System.Drawing.Size(270, 135)
+$draftImageList.Anchor = "Top,Right"
+$draftImageList.DisplayMember = "Display"
+$form.Controls.Add($draftImageList)
+
+$draftPreviewPicture = New-Object System.Windows.Forms.PictureBox
+$draftPreviewPicture.Location = New-Object System.Drawing.Point(1010, 330)
+$draftPreviewPicture.Size = New-Object System.Drawing.Size(270, 210)
+$draftPreviewPicture.Anchor = "Top,Right"
+$draftPreviewPicture.BorderStyle = "FixedSingle"
+$draftPreviewPicture.SizeMode = "Zoom"
+$form.Controls.Add($draftPreviewPicture)
+
+$draftPreviewMessage = New-Object System.Windows.Forms.Label
+$draftPreviewMessage.Text = "尚未選擇圖片"
+$draftPreviewMessage.Location = New-Object System.Drawing.Point(1010, 545)
+$draftPreviewMessage.Size = New-Object System.Drawing.Size(270, 45)
+$draftPreviewMessage.Anchor = "Top,Right"
+$draftPreviewMessage.TextAlign = "MiddleCenter"
+$form.Controls.Add($draftPreviewMessage)
+
 $createButton = New-Object System.Windows.Forms.Button
 $createButton.Text = "建立文章"
 $createButton.Location = New-Object System.Drawing.Point(22, 565)
@@ -301,7 +363,7 @@ $previewButton.Anchor = "Bottom,Left"
 $form.Controls.Add($previewButton)
 
 $publishButton = New-Object System.Windows.Forms.Button
-$publishButton.Text = "發布到 GitHub"
+$publishButton.Text = "發布到 GitHub／Cloudflare"
 $publishButton.Location = New-Object System.Drawing.Point(318, 565)
 $publishButton.Size = New-Object System.Drawing.Size(145, 38)
 $publishButton.Anchor = "Bottom,Left"
@@ -336,6 +398,10 @@ $logBox.ReadOnly = $true
 $logBox.BackColor = [System.Drawing.Color]::FromArgb(247, 244, 237)
 $form.Controls.Add($logBox)
 
+$draftImageList.Add_SelectedIndexChanged({
+    if ($draftImageList.SelectedItem) { Show-DraftImagePreview ([string]$draftImageList.SelectedItem.Path) }
+})
+
 $coverButton.Add_Click({
     $dialog = New-Object System.Windows.Forms.OpenFileDialog
     $dialog.Title = "選擇封面圖片"
@@ -343,6 +409,8 @@ $coverButton.Add_Click({
     if ($dialog.ShowDialog() -eq "OK") {
         $script:CoverFile = $dialog.FileName
         $coverStatus.Text = [System.IO.Path]::GetFileName($script:CoverFile)
+        Refresh-DraftImageList
+        Show-DraftImagePreview $script:CoverFile
     }
 })
 
@@ -361,6 +429,8 @@ $imagesButton.Add_Click({
         $insertText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
         $contentBox.SelectedText = $insertText
         $imagesStatus.Text = "已安排 $($script:BodyImages.Count) 張；可移動圖片標記"
+        Refresh-DraftImageList
+        Show-DraftImagePreview ([string]$script:BodyImages[-1])
         $contentBox.Focus()
     }
 })
@@ -468,8 +538,7 @@ $previewButton.Add_Click({
         Show-ErrorMessage "找不到 Hugo。請確認 Hugo 已安裝。"
         return
     }
-    $arguments = "/k cd /d `"$SiteRoot`" && `"$hugo`" server -D --disableFastRender"
-    Start-Process -FilePath "cmd.exe" -ArgumentList $arguments
+    Start-Process -FilePath $hugo -ArgumentList @('server','-D','--disableFastRender') -WorkingDirectory $SiteRoot -WindowStyle Hidden
     Start-Sleep -Seconds 2
     Start-Process $script:LastPreviewUrl
     Add-Log "已啟動 Hugo 預覽：$script:LastPreviewUrl"
@@ -551,8 +620,8 @@ $publishButton.Add_Click({
                 Show-ErrorMessage "GitHub 上傳失敗。文章仍安全保存在本機。"
                 return
             }
-            Add-Log "GitHub 發布完成。"
-            Show-Info "網站已成功發布到 GitHub。"
+            Add-Log "GitHub 上傳完成；Cloudflare 正在自動更新。"
+            Show-Info "網站資料已上傳 GitHub，Cloudflare Pages 正在自動更新公開網站。"
         } finally {
             Pop-Location
         }

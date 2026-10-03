@@ -3,6 +3,7 @@ Add-Type -AssemblyName System.Drawing
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
+$StaticRoot = Join-Path $SiteRoot "static"
 $script:SelectedPost = $null
 $script:NewImages = @()
 $script:NewCover = $null
@@ -28,6 +29,65 @@ function Get-Value([string]$FrontMatter, [string]$Name) {
     $match = [regex]::Match($FrontMatter, $pattern)
     if ($match.Success) { return $match.Groups[1].Value.Trim() }
     return ""
+}
+
+function Convert-WebImageToLocalPath([string]$WebPath) {
+    if ([string]::IsNullOrWhiteSpace($WebPath) -or $WebPath -match '^https?://') { return $null }
+    $clean = $WebPath.Trim('"', "'", '<', '>') -replace '[?#].*$', ''
+    try { $clean = [Uri]::UnescapeDataString($clean) } catch { }
+    $clean = $clean -replace '^/kirby1215/', '' -replace '^/', ''
+    $candidate = Join-Path $StaticRoot ($clean -replace '/', '\')
+    if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
+    return $null
+}
+
+function Show-ImagePreview([string]$ImagePath) {
+    if ($previewPicture.Image) {
+        $oldImage = $previewPicture.Image
+        $previewPicture.Image = $null
+        $oldImage.Dispose()
+    }
+    if ([string]::IsNullOrWhiteSpace($ImagePath) -or -not (Test-Path -LiteralPath $ImagePath -PathType Leaf)) {
+        $previewMessage.Text = "找不到可預覽的圖片"
+        return
+    }
+    try {
+        $loaded = [System.Drawing.Image]::FromFile($ImagePath)
+        try { $previewPicture.Image = New-Object System.Drawing.Bitmap($loaded) } finally { $loaded.Dispose() }
+        $previewMessage.Text = [System.IO.Path]::GetFileName($ImagePath)
+    } catch {
+        $previewMessage.Text = "此格式儲存後可在網頁預覽"
+    }
+}
+
+function Refresh-ImagePreviewList([string]$FrontMatter, [string]$Body) {
+    $imagePreviewList.Items.Clear()
+    $seen = @{}
+    $cover = Get-Value $FrontMatter "cover"
+    if ($cover) {
+        $local = Convert-WebImageToLocalPath $cover
+        if ($local) {
+            [void]$imagePreviewList.Items.Add([pscustomobject]@{ Display = "封面：$([System.IO.Path]::GetFileName($local))"; Path = $local })
+            $seen[$local.ToLowerInvariant()] = $true
+        }
+    }
+    foreach ($match in [regex]::Matches($Body, '!\[[^\]]*\]\((?:<([^>]+)>|([^\)]+))\)')) {
+        $imageReference = if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value.Trim() }
+        $local = Convert-WebImageToLocalPath $imageReference
+        if ($local -and -not $seen.ContainsKey($local.ToLowerInvariant())) {
+            [void]$imagePreviewList.Items.Add([pscustomobject]@{ Display = "內文：$([System.IO.Path]::GetFileName($local))"; Path = $local })
+            $seen[$local.ToLowerInvariant()] = $true
+        }
+    }
+    for ($i = 0; $i -lt $script:NewImages.Count; $i++) {
+        $path = [string]$script:NewImages[$i]
+        [void]$imagePreviewList.Items.Add([pscustomobject]@{ Display = "新圖片 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
+    }
+    if ($script:NewCover) {
+        [void]$imagePreviewList.Items.Insert(0, [pscustomobject]@{ Display = "新封面：$([System.IO.Path]::GetFileName($script:NewCover))"; Path = [string]$script:NewCover })
+    }
+    if ($imagePreviewList.Items.Count -gt 0) { $imagePreviewList.SelectedIndex = 0 }
+    else { Show-ImagePreview $null }
 }
 
 function Set-Value([string]$FrontMatter, [string]$Name, [string]$Value) {
@@ -80,10 +140,10 @@ function Load-List([string]$Keyword) {
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Kirby1215 編輯文章"
-$form.Size = New-Object System.Drawing.Size(1120, 820)
+$form.Size = New-Object System.Drawing.Size(1380, 820)
 $form.StartPosition = "CenterScreen"
 $form.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 10)
-$form.MinimumSize = New-Object System.Drawing.Size(1000, 720)
+$form.MinimumSize = New-Object System.Drawing.Size(1250, 720)
 
 $searchBox = New-Object System.Windows.Forms.TextBox
 $searchBox.Location = New-Object System.Drawing.Point(18, 18)
@@ -171,6 +231,36 @@ $bodyBox.Anchor = "Top,Bottom,Left,Right"
 $bodyBox.WordWrap = $true
 $form.Controls.Add($bodyBox)
 
+$previewTitle = New-Object System.Windows.Forms.Label
+$previewTitle.Text = "文章圖片預覽"
+$previewTitle.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 11, [System.Drawing.FontStyle]::Bold)
+$previewTitle.Location = New-Object System.Drawing.Point(1105, 105)
+$previewTitle.Size = New-Object System.Drawing.Size(225, 28)
+$previewTitle.Anchor = "Top,Right"
+$form.Controls.Add($previewTitle)
+
+$imagePreviewList = New-Object System.Windows.Forms.ListBox
+$imagePreviewList.Location = New-Object System.Drawing.Point(1105, 145)
+$imagePreviewList.Size = New-Object System.Drawing.Size(235, 155)
+$imagePreviewList.Anchor = "Top,Right"
+$imagePreviewList.DisplayMember = "Display"
+$form.Controls.Add($imagePreviewList)
+
+$previewPicture = New-Object System.Windows.Forms.PictureBox
+$previewPicture.Location = New-Object System.Drawing.Point(1105, 315)
+$previewPicture.Size = New-Object System.Drawing.Size(235, 250)
+$previewPicture.Anchor = "Top,Right"
+$previewPicture.BorderStyle = "FixedSingle"
+$previewPicture.SizeMode = "Zoom"
+$form.Controls.Add($previewPicture)
+
+$previewMessage = New-Object System.Windows.Forms.Label
+$previewMessage.Location = New-Object System.Drawing.Point(1105, 575)
+$previewMessage.Size = New-Object System.Drawing.Size(235, 55)
+$previewMessage.Anchor = "Top,Right"
+$previewMessage.TextAlign = "MiddleCenter"
+$form.Controls.Add($previewMessage)
+
 $saveButton = New-Object System.Windows.Forms.Button
 $saveButton.Text = "備份並儲存修改"
 $saveButton.Location = New-Object System.Drawing.Point(415, 670)
@@ -194,6 +284,9 @@ $form.Controls.Add($exitButton)
 
 $searchButton.Add_Click({ Load-List $searchBox.Text.Trim() })
 $exitButton.Add_Click({ $form.Close() })
+$imagePreviewList.Add_SelectedIndexChanged({
+    if ($imagePreviewList.SelectedItem) { Show-ImagePreview ([string]$imagePreviewList.SelectedItem.Path) }
+})
 
 $postList.Add_SelectedIndexChanged({
     if (-not $postList.SelectedItem) { return }
@@ -212,18 +305,24 @@ $postList.Add_SelectedIndexChanged({
     $script:NewImages = @()
     $script:NewCover = $null
     $imageStatus.Text = "已載入：$($script:SelectedPost.Title)"
+    Refresh-ImagePreviewList $parts.FrontMatter $parts.Body
 })
 
 $coverButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
     $dialog = New-Object System.Windows.Forms.OpenFileDialog
     $dialog.Filter = "圖片檔|*.jpg;*.jpeg;*.png;*.webp;*.gif;*.heic;*.heif"
     if ($dialog.ShowDialog() -eq "OK") {
         $script:NewCover = $dialog.FileName
         $imageStatus.Text = "新封面：$([System.IO.Path]::GetFileName($script:NewCover))"
+        $parts = Split-Post $script:SelectedPost.Raw
+        Refresh-ImagePreviewList $parts.FrontMatter $bodyBox.Text
+        Show-ImagePreview $script:NewCover
     }
 })
 
 $imageButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
     $dialog = New-Object System.Windows.Forms.OpenFileDialog
     $dialog.Filter = "圖片檔|*.jpg;*.jpeg;*.png;*.webp;*.gif;*.heic;*.heif"
     $dialog.Multiselect = $true
@@ -236,6 +335,9 @@ $imageButton.Add_Click({
         $bodyBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
         $bodyBox.Focus()
         $imageStatus.Text = "已安排 $($script:NewImages.Count) 張新圖片"
+        $parts = Split-Post $script:SelectedPost.Raw
+        Refresh-ImagePreviewList $parts.FrontMatter $bodyBox.Text
+        Show-ImagePreview ([string]$script:NewImages[-1])
     }
 })
 

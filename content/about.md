@@ -1,6 +1,8 @@
 ---
 title: 關於我
 date: 2026-09-24
+aliases:
+  - /簡介/
 ---
 
 <figure class="about-hero">
