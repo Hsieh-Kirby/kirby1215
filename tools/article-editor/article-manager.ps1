@@ -22,7 +22,7 @@ function Get-PreviewProcess {
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = "Kirby1215 網站管理"
-$form.Size = New-Object System.Drawing.Size(610, 650)
+$form.Size = New-Object System.Drawing.Size(610, 735)
 $form.StartPosition = "CenterScreen"
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox = $false
@@ -128,24 +128,39 @@ $stopPreviewButton.Add_Click({
     Update-PreviewStatus
 })
 
+$syncButton = New-Object System.Windows.Forms.Button
+$syncButton.Text = "從 GitHub 同步最新資料"
+$syncButton.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 12, [System.Drawing.FontStyle]::Bold)
+$syncButton.Location = New-Object System.Drawing.Point(42, 402)
+$syncButton.Size = New-Object System.Drawing.Size(510, 52)
+$syncButton.Add_Click({ Open-Tool "sync-site.ps1" })
+$form.Controls.Add($syncButton)
+
+$syncHint = New-Object System.Windows.Forms.Label
+$syncHint.Text = "換電腦或開始編輯前先按這裡；只下載有變動的文章與圖片。"
+$syncHint.Location = New-Object System.Drawing.Point(44, 461)
+$syncHint.Size = New-Object System.Drawing.Size(505, 28)
+$syncHint.ForeColor = [System.Drawing.Color]::DimGray
+$form.Controls.Add($syncHint)
+
 $publishButton = New-Object System.Windows.Forms.Button
 $publishButton.Text = "上傳到 GitHub 並同步發布到 Cloudflare"
 $publishButton.Font = New-Object System.Drawing.Font("Microsoft JhengHei", 12, [System.Drawing.FontStyle]::Bold)
-$publishButton.Location = New-Object System.Drawing.Point(42, 402)
+$publishButton.Location = New-Object System.Drawing.Point(42, 498)
 $publishButton.Size = New-Object System.Drawing.Size(510, 58)
 $publishButton.Add_Click({ Open-Tool "publish-site.ps1" })
 $form.Controls.Add($publishButton)
 
 $publishHint = New-Object System.Windows.Forms.Label
 $publishHint.Text = "GitHub 僅保存網站資料；公開網站由 Cloudflare Pages 提供。"
-$publishHint.Location = New-Object System.Drawing.Point(44, 470)
+$publishHint.Location = New-Object System.Drawing.Point(44, 565)
 $publishHint.Size = New-Object System.Drawing.Size(505, 28)
 $publishHint.ForeColor = [System.Drawing.Color]::DimGray
 $form.Controls.Add($publishHint)
 
 $exitButton = New-Object System.Windows.Forms.Button
 $exitButton.Text = "退出"
-$exitButton.Location = New-Object System.Drawing.Point(422, 525)
+$exitButton.Location = New-Object System.Drawing.Point(422, 620)
 $exitButton.Size = New-Object System.Drawing.Size(130, 42)
 $exitButton.Add_Click({ $form.Close() })
 $form.Controls.Add($exitButton)

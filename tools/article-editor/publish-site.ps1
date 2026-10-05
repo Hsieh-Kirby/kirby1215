@@ -1,15 +1,33 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$hugo = "C:\Users\ky\AppData\Local\Microsoft\WinGet\Packages\Hugo.Hugo.Extended_Microsoft.Winget.Source_8wekyb3d8bbwe\hugo.exe"
+
+function Find-Hugo {
+    $command = Get-Command hugo.exe -ErrorAction SilentlyContinue
+    if ($command) { return $command.Source }
+    foreach ($known in @(
+        "C:\Program Files\Hugo\bin\hugo.exe",
+        "C:\Program Files\Hugo\hugo.exe"
+    )) {
+        if (Test-Path -LiteralPath $known -PathType Leaf) { return $known }
+    }
+    $wingetRoot = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Packages"
+    if (Test-Path -LiteralPath $wingetRoot -PathType Container) {
+        $wingetHugo = Get-ChildItem -LiteralPath $wingetRoot -Filter hugo.exe -File -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -like "*Hugo.Hugo.Extended*" } |
+            Select-Object -First 1
+        if ($wingetHugo) { return $wingetHugo.FullName }
+    }
+    return $null
+}
 
 function Find-Git {
     $command = Get-Command git.exe -ErrorAction SilentlyContinue
     if ($command) { return $command.Source }
     foreach ($known in @(
         "C:\Program Files\Git\cmd\git.exe",
-        "C:\Users\ky\AppData\Local\Programs\Git\cmd\git.exe",
-        "C:\Users\ky\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd\git.exe"
+        (Join-Path $env:LOCALAPPDATA "Programs\Git\cmd\git.exe"),
+        (Join-Path $env:USERPROFILE ".cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd\git.exe")
     )) {
         if (Test-Path -LiteralPath $known -PathType Leaf) { return $known }
     }
@@ -34,7 +52,8 @@ function Show-Message([string]$Text, [string]$Icon = "Information") {
 }
 
 try {
-    if (-not (Test-Path -LiteralPath $hugo -PathType Leaf)) { throw "找不到 Hugo，無法進行發布前檢查。" }
+    $hugo = Find-Hugo
+    if (-not $hugo) { throw "找不到 Hugo Extended，無法進行發布前檢查。請先安裝 Hugo Extended。" }
     if (-not (Test-Path -LiteralPath (Join-Path $SiteRoot ".git"))) { throw "網站尚未連接 GitHub。" }
     $git = Find-Git
     if (-not $git) { throw "找不到 Git，無法發布到 GitHub。" }
