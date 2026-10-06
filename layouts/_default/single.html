@@ -29,7 +29,12 @@
                 </p>
                 {{ partial "view-counter.html" . }}
             </header>
-            {{ if .Params.book_landing }}
+            {{ if .Params.series_directory }}
+            <div class="article-content book-landing">
+                <p>本內容已整理為按鈕式專題目錄，包含第一號至第十七號、號外與簡易註釋。</p>
+                {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">開啟御筆先原文目錄</a></p>{{ end }}
+            </div>
+            {{ else if .Params.book_landing }}
             <div class="article-content book-landing">
                 <p>《我所認識的日本》整理為五個部分、四十個章節，方便依主題分段閱讀。</p>
                 {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">開啟全書章節目錄</a></p>{{ end }}

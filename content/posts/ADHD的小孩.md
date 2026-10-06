@@ -3,7 +3,7 @@ title: "ADHD的小孩"
 slug: "adhd的小孩"
 date: "2024-12-14 19:32:00"
 categories:
-  - "天理教"
+  - "生活"
 original_categories:
   - "生活"
   - "天理"

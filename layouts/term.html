@@ -33,6 +33,8 @@
         <section class="series-intro">
             {{ if eq .Title "天理教教祖傳逸話篇" }}
             <p>本頁收錄二百則逸話，依原稿編號排列。</p>
+            {{ else if eq .Title "御筆先原文" }}
+            <p>本頁收錄第一號至第十七號原文，並附號外與簡易註釋。</p>
             {{ else if eq .Title "御筆先導讀" }}
             <p>請先閱讀導讀資料，再依第一號至第十七號的順序閱讀。</p>
             {{ else if eq .Title "我所認識的日本" }}
@@ -54,6 +56,17 @@
                 <strong>第 {{ .Params.episode }} 則</strong>
                 <span>{{ .Title }}</span>
             </a>
+        {{ end }}
+        </div>
+        {{ else if and (eq .Data.Singular "series") (eq .Title "御筆先原文") }}
+        <div class="guide-grid" id="series-post-list" aria-label="御筆先原文目錄">
+        {{ range sort .Pages "Params.original_text_order" "asc" }}
+            {{ if .Params.original_text_order }}
+            <a class="chapter-button" href="{{ .RelPermalink }}">
+                <strong>{{ if le .Params.original_text_order 17 }}御筆先原文{{ else if eq .Params.original_text_order 18 }}補充原文{{ else }}查閱工具{{ end }}</strong>
+                <span>{{ .Title }}</span>
+            </a>
+            {{ end }}
         {{ end }}
         </div>
         {{ else if and (eq .Data.Singular "series") (eq .Title "御筆先導讀") }}
@@ -122,6 +135,7 @@
 {{ if eq .Data.Singular "series" }}
 {{ $seriesSearchIndex := slice }}
 {{ $searchPages := .Pages }}
+{{ $searchPages = where $searchPages "Params.series_landing" "ne" true }}
 {{ if eq .Title "我所認識的日本" }}
     {{ $searchPages = where $searchPages "Section" "japan" }}
 {{ end }}
