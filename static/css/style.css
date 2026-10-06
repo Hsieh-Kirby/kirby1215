@@ -202,6 +202,8 @@ a { color: var(--accent-dark); }
 .chapter-button span { line-height: 1.45; }
 .chapter-button:hover { transform: translateY(-2px); box-shadow: 0 3px 12px rgba(2, 62, 71, .12); }
 .book-directory-link { display: inline-block; padding: 9px 15px; background: var(--accent); color: #fff !important; text-decoration: none; }
+.ofudesaki-text p { margin-bottom: 1.35em; line-height: 1.9; }
+.ofudesaki-text br { display: block; content: ""; }
 .post-card[hidden] { display: none; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 28px; padding: 16px; background: var(--paper-soft); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 14px; }
 .pagination a { color: var(--accent); text-decoration: none; }

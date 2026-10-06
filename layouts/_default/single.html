@@ -51,6 +51,8 @@
                 </div>
                 {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">回到全書章節目錄</a></p>{{ end }}
             </div>
+            {{ else if and .Params.original_text_order (le .Params.original_text_order 18) }}
+            <div class="article-content ofudesaki-text">{{ replace .Content "　" "<br>" | safeHTML }}</div>
             {{ else }}
             <div class="article-content">{{ .Content }}</div>
             {{ end }}
