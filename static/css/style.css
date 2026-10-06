@@ -191,6 +191,7 @@ a { color: var(--accent-dark); }
 .episode-navigation span:last-child { text-align: right; }
 .episode-navigation a { color: var(--accent); text-decoration: none; }
 .book-parts { display: grid; gap: 24px; }
+.guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .book-part { padding: 22px 24px; border: 1px solid var(--line); background: var(--paper-soft); }
 .book-part h2 { margin: 0 0 16px; font-size: 25px; font-weight: 500; }
 .book-part h2 a { color: var(--ink); text-decoration: none; }
@@ -252,6 +253,7 @@ a { color: var(--accent-dark); }
     .taxonomy-list { grid-template-columns: 1fr; }
     .episode-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .chapter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .site-footer { margin-bottom: 0; }
 }
 
@@ -261,6 +263,7 @@ a { color: var(--accent-dark); }
     .single-article { padding-left: 3px; padding-right: 3px; }
     .episode-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
     .chapter-grid { grid-template-columns: 1fr; }
+    .guide-grid { grid-template-columns: 1fr; }
     .book-part { padding: 18px 15px; }
     .episode-button { min-height: 72px; padding: 10px 8px; }
     .episode-navigation { grid-template-columns: 1fr; text-align: center; }

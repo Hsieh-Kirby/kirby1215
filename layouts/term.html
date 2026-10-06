@@ -33,6 +33,8 @@
         <section class="series-intro">
             {{ if eq .Title "天理教教祖傳逸話篇" }}
             <p>本頁收錄二百則逸話，依原稿編號排列。</p>
+            {{ else if eq .Title "御筆先導讀" }}
+            <p>請先閱讀導讀資料，再依第一號至第十七號的順序閱讀。</p>
             {{ else if eq .Title "我所認識的日本" }}
             <p>本書分為五個部分；請先選擇部分，再選擇其中的章節。</p>
             {{ else }}
@@ -50,6 +52,15 @@
         {{ range sort .Pages "Params.episode" "asc" }}
             <a class="episode-button" href="{{ .RelPermalink }}">
                 <strong>第 {{ .Params.episode }} 則</strong>
+                <span>{{ .Title }}</span>
+            </a>
+        {{ end }}
+        </div>
+        {{ else if and (eq .Data.Singular "series") (eq .Title "御筆先導讀") }}
+        <div class="guide-grid" id="series-post-list" aria-label="御筆先導讀目錄">
+        {{ range sort .Pages "Params.guide_order" "asc" }}
+            <a class="chapter-button" href="{{ .RelPermalink }}">
+                <strong>{{ if le .Params.guide_order 4 }}導讀資料{{ else }}御筆先{{ end }}</strong>
                 <span>{{ .Title }}</span>
             </a>
         {{ end }}
