@@ -13,8 +13,15 @@
     <main class="article-main">
         <h1 class="page-title">{{ .Title }}</h1>
         <div class="taxonomy-list">
+        {{ $isCategoryIndex := eq .Data.Plural "categories" }}
         {{ range .Pages.ByTitle }}
-            <a class="taxonomy-card" href="{{ .RelPermalink }}"><span>{{ .Title }}</span><small>{{ len .Pages }} 篇文章</small></a>
+            {{ $termPages := .Pages }}
+            {{ if $isCategoryIndex }}
+                {{ $termPages = where $termPages "Params.hide_from_lists" "ne" true }}
+            {{ else }}
+                {{ $termPages = where $termPages "Params.series_landing" "ne" true }}
+            {{ end }}
+            <a class="taxonomy-card" href="{{ .RelPermalink }}"><span>{{ .Title }}</span><small>{{ len $termPages }} 篇文章</small></a>
         {{ end }}
         </div>
     </main>

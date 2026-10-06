@@ -10,7 +10,9 @@
     </select>
     <p class="recent-result" id="recent-result" aria-live="polite"></p>
     <ul id="recent-list">
-        {{ range (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+        {{ $recentPosts := where .Site.RegularPages.ByDate.Reverse "Section" "posts" }}
+        {{ $recentPosts = where $recentPosts "Params.hide_from_lists" "ne" true }}
+        {{ range $recentPosts }}
             <li data-date="{{ .Date.Format "2006-01-02" }}">
                 <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                 <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>

@@ -13,7 +13,9 @@
     <main class="article-main">
         <h1 class="page-title">最新文章</h1>
         <div class="post-list">
-        {{ range (where .Site.RegularPages "Section" "posts").ByDate.Reverse }}
+        {{ $posts := where .Site.RegularPages "Section" "posts" }}
+        {{ $posts = where $posts "Params.hide_from_lists" "ne" true }}
+        {{ range $posts.ByDate.Reverse }}
             <article class="post-card">
                 {{ partial "featured-image.html" . }}
                 <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>

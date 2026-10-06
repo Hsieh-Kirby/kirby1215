@@ -20,6 +20,7 @@
             <div class="series-links">
             {{ range .Site.Taxonomies.series.ByCount }}
                 {{ $matched := where .Pages "Params.categories" "intersect" (slice $category) }}
+                {{ $matched = where $matched "Params.series_landing" "ne" true }}
                 {{ if gt (len $matched) 0 }}
                 <a href="{{ .Page.RelPermalink }}"><span>{{ .Page.LinkTitle }}</span><small>{{ len $matched }} 篇</small></a>
                 {{ end }}
@@ -30,7 +31,13 @@
 
         {{ if eq .Data.Singular "series" }}
         <section class="series-intro">
+            {{ if eq .Title "天理教教祖傳逸話篇" }}
+            <p>本頁收錄二百則逸話，依原稿編號排列。</p>
+            {{ else if eq .Title "我所認識的日本" }}
+            <p>本書分為五個部分；請先選擇部分，再選擇其中的章節。</p>
+            {{ else }}
             <p>本頁收錄「{{ .Title }}」專題文章，依日期由新到舊排列。</p>
+            {{ end }}
             <label for="series-filter">搜尋本專題</label>
             <input id="series-filter" type="search" placeholder="輸入文章標題或內容關鍵字" autocomplete="off">
             <p id="series-filter-status" class="series-filter-status" aria-live="polite"></p>
@@ -38,7 +45,42 @@
         </section>
         {{ end }}
 
-        {{ $paginator := .Paginate (.Pages.ByDate.Reverse) 10 }}
+        {{ if and (eq .Data.Singular "series") (eq .Title "天理教教祖傳逸話篇") }}
+        <div class="episode-grid" id="series-post-list" aria-label="天理教教祖傳逸話篇目錄">
+        {{ range sort .Pages "Params.episode" "asc" }}
+            <a class="episode-button" href="{{ .RelPermalink }}">
+                <strong>第 {{ .Params.episode }} 則</strong>
+                <span>{{ .Title }}</span>
+            </a>
+        {{ end }}
+        </div>
+        {{ else if and (eq .Data.Singular "series") (eq .Title "我所認識的日本") }}
+        <div class="book-parts" id="series-post-list" aria-label="我所認識的日本章節目錄">
+        {{ $seriesPages := .Pages }}
+        {{ range seq 1 5 }}
+            {{ $partNumber := . }}
+            {{ $partPages := where $seriesPages "Params.part" $partNumber }}
+            {{ $landingPages := where $seriesPages "Params.chapterized_part" $partNumber }}
+            {{ $landing := index $landingPages 0 }}
+            <section class="book-part">
+                <h2><a href="{{ $landing.RelPermalink }}">{{ $landing.Title }}</a></h2>
+                <div class="chapter-grid">
+                {{ range sort $partPages "Params.chapter_order" "asc" }}
+                    <a class="chapter-button" href="{{ .RelPermalink }}">
+                        <strong>第 {{ .Params.chapter }} 章</strong>
+                        <span>{{ .Title }}</span>
+                    </a>
+                {{ end }}
+                </div>
+            </section>
+        {{ end }}
+        </div>
+        {{ else }}
+        {{ $termPages := .Pages }}
+        {{ if eq .Data.Singular "category" }}
+            {{ $termPages = where $termPages "Params.hide_from_lists" "ne" true }}
+        {{ end }}
+        {{ $paginator := .Paginate ($termPages.ByDate.Reverse) 10 }}
         <div class="post-list" id="series-post-list">
         {{ range $paginator.Pages }}
             <article class="post-card">
@@ -58,6 +100,7 @@
             {{ with $paginator.Next }}<a href="{{ .URL }}">下一頁 →</a>{{ end }}
         </nav>
         {{ end }}
+        {{ end }}
     </main>
     <div class="sidebar-column">
         {{ partial "site-search.html" . }}
@@ -67,7 +110,11 @@
 {{ partial "site-footer.html" . }}
 {{ if eq .Data.Singular "series" }}
 {{ $seriesSearchIndex := slice }}
-{{ range .Pages.ByDate.Reverse }}
+{{ $searchPages := .Pages }}
+{{ if eq .Title "我所認識的日本" }}
+    {{ $searchPages = where $searchPages "Section" "japan" }}
+{{ end }}
+{{ range $searchPages.ByDate.Reverse }}
     {{ $seriesSearchIndex = $seriesSearchIndex | append (dict "title" .Title "url" .RelPermalink "date" (.Date.Format "2006年01月02日") "content" (.Plain | plainify)) }}
 {{ end }}
 <script>

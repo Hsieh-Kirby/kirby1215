@@ -1,5 +1,7 @@
 {{- $searchIndex := slice -}}
-{{- range (where .Site.RegularPages "Section" "posts") -}}
+{{- $searchPages := where .Site.RegularPages "Section" "posts" -}}
+{{- $searchPages = where $searchPages "Params.hide_from_lists" "ne" true -}}
+{{- range $searchPages -}}
     {{- $searchIndex = $searchIndex | append (dict
         "title" .Title
         "url" .RelPermalink

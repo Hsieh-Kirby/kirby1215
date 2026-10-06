@@ -15,16 +15,55 @@
             <header class="article-header">
                 <h1>{{ .Title }}</h1>
                 <p class="article-meta">
+                    {{ if eq .Section "itsuwa" }}
+                    <span>天理教教祖傳逸話篇　第 {{ .Params.episode }} 則</span>
+                    {{ else if eq .Section "japan" }}
+                    <span>{{ .Params.part_title }}　第 {{ .Params.chapter }} 章</span>
+                    {{ else }}
                     <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
                     {{ with .Params.categories }}<span>分類：{{ delimit . "、" }}</span>{{ end }}
+                    {{ end }}
                     {{ with .GetTerms "series" }}
                     <span>專題：{{ range $index, $term := . }}{{ if $index }}、{{ end }}<a href="{{ $term.RelPermalink }}">{{ $term.LinkTitle }}</a>{{ end }}</span>
                     {{ end }}
                 </p>
                 {{ partial "view-counter.html" . }}
             </header>
+            {{ if .Params.book_landing }}
+            <div class="article-content book-landing">
+                <p>《我所認識的日本》整理為五個部分、四十個章節，方便依主題分段閱讀。</p>
+                {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">開啟全書章節目錄</a></p>{{ end }}
+            </div>
+            {{ else if .Params.chapterized_part }}
+            {{ $partNumber := .Params.chapterized_part }}
+            {{ $chapters := where (where .Site.RegularPages "Section" "japan") "Params.part" $partNumber }}
+            <div class="article-content part-landing">
+                <p>本部分已依原文小標題分成 {{ len $chapters }} 個章節，請選擇要閱讀的章節。</p>
+                <div class="chapter-grid">
+                {{ range sort $chapters "Params.chapter_order" "asc" }}
+                    <a class="chapter-button" href="{{ .RelPermalink }}"><strong>第 {{ .Params.chapter }} 章</strong><span>{{ .Title }}</span></a>
+                {{ end }}
+                </div>
+                {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">回到全書章節目錄</a></p>{{ end }}
+            </div>
+            {{ else }}
             <div class="article-content">{{ .Content }}</div>
-            {{ if eq .Section "posts" }}
+            {{ end }}
+            {{ if eq .Section "itsuwa" }}
+            <nav class="episode-navigation" aria-label="逸話篇前後篇導覽">
+                <span>{{ with .PrevInSection }}<a href="{{ .RelPermalink }}">← 上一則</a>{{ end }}</span>
+                <a href="{{ with .GetTerms "series" }}{{ (index . 0).RelPermalink }}{{ end }}">回到200則目錄</a>
+                <span>{{ with .NextInSection }}<a href="{{ .RelPermalink }}">下一則 →</a>{{ end }}</span>
+            </nav>
+            {{ end }}
+            {{ if eq .Section "japan" }}
+            <nav class="episode-navigation" aria-label="書籍前後章導覽">
+                <span>{{ with .PrevInSection }}<a href="{{ .RelPermalink }}">← 上一章</a>{{ end }}</span>
+                {{ with .GetTerms "series" }}<a href="{{ (index . 0).RelPermalink }}">回到全書目錄</a>{{ end }}
+                <span>{{ with .NextInSection }}<a href="{{ .RelPermalink }}">下一章 →</a>{{ end }}</span>
+            </nav>
+            {{ end }}
+            {{ if or (eq .Section "posts") (eq .Section "japan") }}
             <aside class="article-contact" aria-label="聯絡作者">
                 <p>對本文有任何意見，歡迎來信與我分享。</p>
                 <a class="contact-email" href="mailto:0932sya@gmail.com?subject={{ printf "讀者意見：%s" .Title | urlquery }}">寄信給謝科比</a>

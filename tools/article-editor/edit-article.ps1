@@ -3,10 +3,33 @@ Add-Type -AssemblyName System.Drawing
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
+$ContentRoots = @(
+    $PostsRoot,
+    (Join-Path $SiteRoot "content\itsuwa"),
+    (Join-Path $SiteRoot "content\japan")
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Container }
 $StaticRoot = Join-Path $SiteRoot "static"
 $script:SelectedPost = $null
 $script:NewImages = @()
 $script:NewCover = $null
+
+function Get-SeriesChoices {
+    $names = New-Object System.Collections.Generic.List[string]
+    Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ne '_index.md' } | ForEach-Object {
+        $raw = [System.IO.File]::ReadAllText($_.FullName)
+        $match = [regex]::Match($raw, '(?ms)^series:\s*\r?\n((?:\s+-[^\r\n]*\r?\n?)*)')
+        if ($match.Success) {
+            [regex]::Matches($match.Groups[1].Value, '(?m)^\s+-\s*["'']?([^"''\r\n]+)') | ForEach-Object {
+                $name = $_.Groups[1].Value.Trim()
+                if ($name) { $names.Add($name) }
+            }
+        }
+    }
+    return @("無專題") + @($names | Sort-Object -Unique)
+}
+
+$SeriesChoices = Get-SeriesChoices
 
 function Show-Info([string]$Message) {
     [System.Windows.Forms.MessageBox]::Show($Message, "Kirby1215 編輯文章", "OK", "Information") | Out-Null
@@ -14,6 +37,24 @@ function Show-Info([string]$Message) {
 
 function Show-ErrorMessage([string]$Message) {
     [System.Windows.Forms.MessageBox]::Show($Message, "Kirby1215 編輯文章", "OK", "Error") | Out-Null
+}
+
+function Format-ArticleParagraphs([string]$Text) {
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $Text }
+    $normalized = $Text -replace "`r`n?", "`n"
+    $blocks = [regex]::Split($normalized, "`n[ `t]*`n")
+    $formatted = foreach ($block in $blocks) {
+        $lines = @($block -split "`n")
+        $isMarkdownBlock = $lines.Count -gt 1 -and ($lines | Where-Object {
+            $_.Trim() -match '^(?:```|~~~|#{1,6}\s|>|[-*+]\s|\d+[.)]\s|\|)'
+        }).Count -eq $lines.Count
+        if ($lines.Count -gt 1 -and -not $isMarkdownBlock) {
+            $lines -join "`r`n`r`n"
+        } else {
+            $lines -join "`r`n"
+        }
+    }
+    return ($formatted -join "`r`n`r`n").Trim()
 }
 
 . (Join-Path $PSScriptRoot "image-tools.ps1")
@@ -105,6 +146,29 @@ function Set-Category([string]$FrontMatter, [string]$Category) {
     return $FrontMatter.TrimEnd() + "`r`n" + $block
 }
 
+function Get-Series([string]$FrontMatter) {
+    $match = [regex]::Match($FrontMatter, '(?ms)^series:\s*\r?\n((?:\s+-[^\r\n]*\r?\n?)*)')
+    if (-not $match.Success) { return "無專題" }
+    $items = @([regex]::Matches($match.Groups[1].Value, '(?m)^\s+-\s*["'']?([^"''\r\n]+)') |
+        ForEach-Object { $_.Groups[1].Value.Trim() })
+    if ($items.Count -eq 0) { return "無專題" }
+    return ($items -join '、')
+}
+
+function Set-Series([string]$FrontMatter, [string]$Series) {
+    $pattern = '(?ms)^series:\s*\r?\n(?:\s+-[^\r\n]*\r?\n?)*'
+    if ($Series -eq "無專題" -or [string]::IsNullOrWhiteSpace($Series)) {
+        return [regex]::Replace($FrontMatter, $pattern, '', 1).TrimEnd()
+    }
+    $lines = @($Series -split '[、,，]+' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        ForEach-Object { '  - "' + $_.Trim() + '"' })
+    $block = "series:`r`n" + ($lines -join "`r`n")
+    if ([regex]::IsMatch($FrontMatter, $pattern)) {
+        return [regex]::Replace($FrontMatter, $pattern, $block + "`r`n", 1)
+    }
+    return $FrontMatter.TrimEnd() + "`r`n" + $block
+}
+
 function Set-CoverAsFirstImage([string]$Body, [string]$OldCover, [string]$NewCover, [string]$Title) {
     $updatedBody = $Body
     if (-not [string]::IsNullOrWhiteSpace($OldCover)) {
@@ -118,7 +182,8 @@ function Set-CoverAsFirstImage([string]$Body, [string]$OldCover, [string]$NewCov
 }
 
 function Get-PostItems([string]$Keyword) {
-    Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
+    Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
+        Where-Object { $_.Name -ne '_index.md' } | ForEach-Object {
         $raw = [System.IO.File]::ReadAllText($_.FullName)
         try {
             $parts = Split-Post $raw
@@ -126,7 +191,11 @@ function Get-PostItems([string]$Keyword) {
             $date = Get-Value $parts.FrontMatter "date"
             if (-not $title) { $title = $_.BaseName }
             if (-not $Keyword -or $title -like "*$Keyword*" -or $parts.Body -like "*$Keyword*") {
-                [pscustomobject]@{ Display = "$date　$title"; Title = $title; Date = $date; Path = $_.FullName; Raw = $raw }
+                $section = Split-Path -Leaf $_.DirectoryName
+                $sectionLabel = if (Get-Value $parts.FrontMatter 'chapterized_part') { '專題目錄' } elseif (Get-Value $parts.FrontMatter 'book_landing') { '專題總目錄' } else {
+                    switch ($section) { 'itsuwa' { '逸話' } 'japan' { '日本專題' } default { '文章' } }
+                }
+                [pscustomobject]@{ Display = "[$sectionLabel] $date　$title"; Title = $title; Date = $date; Path = $_.FullName; Raw = $raw }
             }
         } catch { }
     } | Sort-Object Date -Descending
@@ -176,9 +245,23 @@ $form.Controls.Add($titleLabel)
 
 $titleBox = New-Object System.Windows.Forms.TextBox
 $titleBox.Location = New-Object System.Drawing.Point(470, 17)
-$titleBox.Size = New-Object System.Drawing.Size(615, 28)
+$titleBox.Size = New-Object System.Drawing.Size(350, 28)
 $titleBox.Anchor = "Top,Left,Right"
 $form.Controls.Add($titleBox)
+
+$seriesLabel = New-Object System.Windows.Forms.Label
+$seriesLabel.Text = "專題"
+$seriesLabel.Location = New-Object System.Drawing.Point(835, 20)
+$seriesLabel.AutoSize = $true
+$form.Controls.Add($seriesLabel)
+
+$seriesBox = New-Object System.Windows.Forms.ComboBox
+$seriesBox.Location = New-Object System.Drawing.Point(880, 17)
+$seriesBox.Size = New-Object System.Drawing.Size(205, 28)
+$seriesBox.DropDownStyle = "DropDown"
+[void]$seriesBox.Items.AddRange($SeriesChoices)
+$seriesBox.SelectedIndex = 0
+$form.Controls.Add($seriesBox)
 
 $dateLabel = New-Object System.Windows.Forms.Label
 $dateLabel.Text = "日期"
@@ -301,6 +384,8 @@ $postList.Add_SelectedIndexChanged({
     $category = if ($categoryMatch.Success) { $categoryMatch.Groups[1].Value.Trim() } else { "生活" }
     $categoryBox.SelectedItem = $category
     if ($categoryBox.SelectedIndex -lt 0) { $categoryBox.SelectedIndex = 0 }
+    $series = Get-Series $parts.FrontMatter
+    $seriesBox.Text = $series
     $bodyBox.Text = $parts.Body.TrimEnd()
     $script:NewImages = @()
     $script:NewCover = $null
@@ -354,7 +439,8 @@ $saveButton.Add_Click({
         $front = Set-Value $front "date" $datePicker.Value.ToString("yyyy-MM-dd HH:mm:ss")
         if ($slugBox.Text.Trim()) { $front = Set-Value $front "slug" $slugBox.Text.Trim() }
         $front = Set-Category $front ([string]$categoryBox.SelectedItem)
-        $body = $bodyBox.Text.TrimEnd()
+        $front = Set-Series $front $seriesBox.Text.Trim()
+        $body = Format-ArticleParagraphs $bodyBox.Text
 
         $assetKey = "edit-" + (Get-Date -Format "yyyyMMdd-HHmmss")
         $assetDir = Join-Path $SiteRoot ("static\images\posts\" + $assetKey)

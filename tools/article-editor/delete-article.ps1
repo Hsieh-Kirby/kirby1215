@@ -3,6 +3,11 @@ Add-Type -AssemblyName System.Drawing
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
+$ContentRoots = @(
+    $PostsRoot,
+    (Join-Path $SiteRoot "content\itsuwa"),
+    (Join-Path $SiteRoot "content\japan")
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Container }
 $StaticRoot = Join-Path $SiteRoot "static"
 
 function Show-Info([string]$Message) {
@@ -59,7 +64,8 @@ function Convert-UrlToStaticPath([string]$Url) {
 
 function Load-Posts {
     $postList.Items.Clear()
-    Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File |
+    Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
+        Where-Object { $_.Name -ne '_index.md' } |
         ForEach-Object { Get-PostInfo $_ } |
         Sort-Object Date -Descending |
         ForEach-Object { [void]$postList.Items.Add($_) }
@@ -143,7 +149,8 @@ $searchButton.Add_Click({
     $keyword = $searchBox.Text.Trim()
     if (-not $keyword) { Load-Posts; return }
     $postList.Items.Clear()
-    Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File |
+    Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
+        Where-Object { $_.Name -ne '_index.md' } |
         ForEach-Object { Get-PostInfo $_ } |
         Where-Object { $_.Title -like "*$keyword*" -or $_.Content -like "*$keyword*" } |
         Sort-Object Date -Descending |
@@ -164,7 +171,8 @@ $deleteButton.Add_Click({
 
     $selected = $postList.SelectedItem
     $imageUrls = Get-LocalImageReferences $selected.Content
-    $allOtherContent = Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File |
+    $allOtherContent = Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
+        Where-Object { $_.Name -ne '_index.md' } |
         Where-Object { $_.FullName -ne $selected.Path } |
         ForEach-Object { [System.IO.File]::ReadAllText($_.FullName) }
     $sharedText = $allOtherContent -join "`n"
@@ -188,7 +196,8 @@ $deleteButton.Add_Click({
 
     try {
         $backupRoot = Join-Path $SiteRoot ("migration-backups\deleted-posts\" + (Get-Date -Format "yyyyMMdd-HHmmss"))
-        $postBackup = Join-Path $backupRoot "content\posts"
+        $sectionName = Split-Path -Leaf (Split-Path -Parent $selected.Path)
+        $postBackup = Join-Path $backupRoot ("content\" + $sectionName)
         New-Item -ItemType Directory -Path $postBackup -Force | Out-Null
 
         foreach ($imagePath in $filesToMove) {

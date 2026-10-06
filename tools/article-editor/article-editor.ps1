@@ -6,6 +6,23 @@ $script:CoverFile = $null
 $script:BodyImages = @()
 $script:LastPreviewUrl = "http://localhost:1313/kirby1215/"
 
+function Get-SeriesChoices {
+    $names = New-Object System.Collections.Generic.List[string]
+    Get-ChildItem -LiteralPath (Join-Path $SiteRoot "content") -Filter '*.md' -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object {
+        $raw = [System.IO.File]::ReadAllText($_.FullName)
+        $match = [regex]::Match($raw, '(?ms)^series:\s*\r?\n((?:\s+-[^\r\n]*\r?\n?)*)')
+        if ($match.Success) {
+            [regex]::Matches($match.Groups[1].Value, '(?m)^\s+-\s*["'']?([^"''\r\n]+)') | ForEach-Object {
+                $name = $_.Groups[1].Value.Trim()
+                if ($name) { $names.Add($name) }
+            }
+        }
+    }
+    return @("無專題") + @($names | Sort-Object -Unique)
+}
+
+$SeriesChoices = Get-SeriesChoices
+
 function Show-Info([string]$Message) {
     [System.Windows.Forms.MessageBox]::Show($Message, "Kirby1215 發文工具", "OK", "Information") | Out-Null
 }
@@ -35,6 +52,24 @@ function Convert-ToSafeAssetKey([string]$Value, [datetime]$Date) {
 
 function Escape-Yaml([string]$Value) {
     return $Value.Replace("\", "\\").Replace('"', '\"')
+}
+
+function Format-ArticleParagraphs([string]$Text) {
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $Text }
+    $normalized = $Text -replace "`r`n?", "`n"
+    $blocks = [regex]::Split($normalized, "`n[ `t]*`n")
+    $formatted = foreach ($block in $blocks) {
+        $lines = @($block -split "`n")
+        $isMarkdownBlock = $lines.Count -gt 1 -and ($lines | Where-Object {
+            $_.Trim() -match '^(?:```|~~~|#{1,6}\s|>|[-*+]\s|\d+[.)]\s|\|)'
+        }).Count -eq $lines.Count
+        if ($lines.Count -gt 1 -and -not $isMarkdownBlock) {
+            $lines -join "`r`n`r`n"
+        } else {
+            $lines -join "`r`n"
+        }
+    }
+    return ($formatted -join "`r`n`r`n").Trim()
 }
 
 function Find-HeifConvert {
@@ -268,15 +303,29 @@ $categoryBox.DropDownStyle = "DropDownList"
 $categoryBox.SelectedIndex = 0
 $form.Controls.Add($categoryBox)
 
+$seriesLabel = New-Object System.Windows.Forms.Label
+$seriesLabel.Text = "專題"
+$seriesLabel.Location = New-Object System.Drawing.Point(310, 60)
+$seriesLabel.AutoSize = $true
+$form.Controls.Add($seriesLabel)
+
+$seriesBox = New-Object System.Windows.Forms.ComboBox
+$seriesBox.Location = New-Object System.Drawing.Point(360, 57)
+$seriesBox.Size = New-Object System.Drawing.Size(190, 28)
+$seriesBox.DropDownStyle = "DropDown"
+[void]$seriesBox.Items.AddRange($SeriesChoices)
+$seriesBox.SelectedIndex = 0
+$form.Controls.Add($seriesBox)
+
 $slugLabel = New-Object System.Windows.Forms.Label
 $slugLabel.Text = "網址名稱（可留空）"
-$slugLabel.Location = New-Object System.Drawing.Point(310, 60)
+$slugLabel.Location = New-Object System.Drawing.Point(580, 60)
 $slugLabel.AutoSize = $true
 $form.Controls.Add($slugLabel)
 
 $slugBox = New-Object System.Windows.Forms.TextBox
-$slugBox.Location = New-Object System.Drawing.Point(465, 57)
-$slugBox.Size = New-Object System.Drawing.Size(300, 28)
+$slugBox.Location = New-Object System.Drawing.Point(735, 57)
+$slugBox.Size = New-Object System.Drawing.Size(255, 28)
 $form.Controls.Add($slugBox)
 
 $coverButton = New-Object System.Windows.Forms.Button
@@ -304,7 +353,7 @@ $imagesStatus.Size = New-Object System.Drawing.Size(220, 24)
 $form.Controls.Add($imagesStatus)
 
 $contentLabel = New-Object System.Windows.Forms.Label
-$contentLabel.Text = "文章正文（可直接貼上純文字或 Markdown）"
+$contentLabel.Text = "文章正文（段落按 Enter 一次即可；也支援 Markdown）"
 $contentLabel.Location = New-Object System.Drawing.Point(22, 150)
 $contentLabel.AutoSize = $true
 $form.Controls.Add($contentLabel)
@@ -445,6 +494,7 @@ $createButton.Add_Click({
 
         $date = $datePicker.Value
         $category = [string]$categoryBox.SelectedItem
+        $series = $seriesBox.Text.Trim()
         $slug = $slugBox.Text.Trim()
         if ([string]::IsNullOrWhiteSpace($slug)) { $slug = $title }
         $slug = ($slug -replace "\s+", "-" -replace "[\\/?#]+", "-").Trim("-")
@@ -495,10 +545,16 @@ $createButton.Add_Click({
             "categories:"
             "  - `"$(Escape-Yaml $category)`""
         )
+        if ($series -ne "無專題" -and -not [string]::IsNullOrWhiteSpace($series)) {
+            $frontMatter += "series:"
+            $series -split '[、,，]+' | ForEach-Object {
+                if (-not [string]::IsNullOrWhiteSpace($_)) { $frontMatter += "  - `"$(Escape-Yaml $_.Trim())`"" }
+            }
+        }
         if ($coverWebPath) { $frontMatter += "cover: `"$coverWebPath`"" }
         $frontMatter += "---"
 
-        $body = $contentBox.Text.Trim()
+        $body = Format-ArticleParagraphs $contentBox.Text
         for ($imageIndex = 0; $imageIndex -lt $imageMarkdown.Count; $imageIndex++) {
             $marker = "[[IMAGE:{0:d3}]]" -f ($imageIndex + 1)
             if ($body.Contains($marker)) {

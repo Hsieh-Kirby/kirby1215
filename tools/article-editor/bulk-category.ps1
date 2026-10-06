@@ -3,8 +3,12 @@ Add-Type -AssemblyName System.Drawing
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
+$ContentRoots = @(
+    $PostsRoot,
+    (Join-Path $SiteRoot "content\itsuwa"),
+    (Join-Path $SiteRoot "content\japan")
+) | Where-Object { Test-Path -LiteralPath $_ -PathType Container }
 $Categories = @("生活", "音樂", "天理教", "思考")
-$SeriesChoices = @("無專題", "福特萬格勒", "克倫培勒", "福特萬格勒、克倫培勒", "松本滋")
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 function Split-Post([string]$Text) {
@@ -53,7 +57,8 @@ function Set-Series([string]$FrontMatter, [string]$Series) {
     if ($Series -eq '無專題' -or [string]::IsNullOrWhiteSpace($Series)) {
         return [regex]::Replace($FrontMatter, $pattern, '', 1).TrimEnd()
     }
-    $lines = @($Series -split '、' | ForEach-Object { '  - "' + $_.Trim() + '"' })
+    $lines = @($Series -split '[、,，]+' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        ForEach-Object { '  - "' + $_.Trim() + '"' })
     $block = "series:`r`n" + ($lines -join "`r`n")
     if ([regex]::IsMatch($FrontMatter, $pattern)) {
         return [regex]::Replace($FrontMatter, $pattern, $block + "`r`n", 1)
@@ -62,7 +67,8 @@ function Set-Series([string]$FrontMatter, [string]$Series) {
 }
 
 $script:AllPosts = @()
-Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
+Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
+    Where-Object { $_.Name -ne '_index.md' } | ForEach-Object {
     try {
         $raw = [System.IO.File]::ReadAllText($_.FullName)
         $parts = Split-Post $raw
@@ -80,6 +86,9 @@ Get-ChildItem -LiteralPath $PostsRoot -Filter '*.md' -File | ForEach-Object {
     } catch { }
 }
 $script:AllPosts = @($script:AllPosts | Sort-Object Date -Descending)
+$SeriesChoices = @("無專題") + @($script:AllPosts | ForEach-Object {
+    if ($_.Series -and $_.Series -ne '無專題') { $_.Series -split '、' }
+} | Where-Object { $_ } | Sort-Object -Unique)
 
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Kirby1215 批次修改分類與專題'
@@ -89,7 +98,7 @@ $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object System.Drawing.Font('Microsoft JhengHei', 10)
 
 $hint = New-Object System.Windows.Forms.Label
-$hint.Text = '在「分類」欄直接選擇；也可以選取多列，再用上方功能一次修改。最後按「備份並儲存全部修改」。'
+$hint.Text = '分類可直接選擇；專題可輸入新名稱。要將專題改名，可搜尋舊專題、選取文章，再套用新名稱。'
 $hint.Location = New-Object System.Drawing.Point(18, 16)
 $hint.Size = New-Object System.Drawing.Size(930, 25)
 $form.Controls.Add($hint)
@@ -100,7 +109,7 @@ $searchBox.Size = New-Object System.Drawing.Size(245, 28)
 $form.Controls.Add($searchBox)
 
 $searchButton = New-Object System.Windows.Forms.Button
-$searchButton.Text = '搜尋標題'
+$searchButton.Text = '搜尋'
 $searchButton.Location = New-Object System.Drawing.Point(272, 47)
 $searchButton.Size = New-Object System.Drawing.Size(95, 34)
 $form.Controls.Add($searchButton)
@@ -122,7 +131,7 @@ $form.Controls.Add($bulkButton)
 $bulkSeriesBox = New-Object System.Windows.Forms.ComboBox
 $bulkSeriesBox.Location = New-Object System.Drawing.Point(630, 50)
 $bulkSeriesBox.Size = New-Object System.Drawing.Size(175, 28)
-$bulkSeriesBox.DropDownStyle = 'DropDownList'
+$bulkSeriesBox.DropDownStyle = 'DropDown'
 [void]$bulkSeriesBox.Items.AddRange($SeriesChoices)
 $bulkSeriesBox.SelectedIndex = 0
 $form.Controls.Add($bulkSeriesBox)
@@ -173,23 +182,23 @@ $categoryCol.FlatStyle = 'Flat'
 [void]$categoryCol.Items.AddRange($Categories)
 [void]$grid.Columns.Add($categoryCol)
 
-$seriesCol = New-Object System.Windows.Forms.DataGridViewComboBoxColumn
+$seriesCol = New-Object System.Windows.Forms.DataGridViewTextBoxColumn
 $seriesCol.HeaderText = '專題'
 $seriesCol.Name = 'Series'
 $seriesCol.Width = 185
-$seriesCol.FlatStyle = 'Flat'
-[void]$seriesCol.Items.AddRange($SeriesChoices)
 [void]$grid.Columns.Add($seriesCol)
 
 function Load-Grid([string]$Keyword) {
     $grid.Rows.Clear()
     $items = $script:AllPosts
     if (-not [string]::IsNullOrWhiteSpace($Keyword)) {
-        $items = @($items | Where-Object { $_.Title -like "*$Keyword*" })
+        $items = @($items | Where-Object {
+            $_.Title -like "*$Keyword*" -or $_.Category -like "*$Keyword*" -or $_.Series -like "*$Keyword*"
+        })
     }
     foreach ($post in $items) {
         $category = if ($Categories -contains $post.Category) { $post.Category } else { '生活' }
-        $series = if ($SeriesChoices -contains $post.Series) { $post.Series } else { '無專題' }
+        $series = if ($post.Series) { $post.Series } else { '無專題' }
         $index = $grid.Rows.Add($post.Date, $post.Title, $category, $series)
         $grid.Rows[$index].Tag = $post
     }
@@ -217,8 +226,10 @@ $bulkSeriesButton.Add_Click({
         return
     }
     foreach ($row in $grid.SelectedRows) {
-        $row.Cells['Series'].Value = [string]$bulkSeriesBox.SelectedItem
-        if ($row.Tag) { $row.Tag.Series = [string]$bulkSeriesBox.SelectedItem }
+        $newSeries = $bulkSeriesBox.Text.Trim()
+        if ([string]::IsNullOrWhiteSpace($newSeries)) { $newSeries = '無專題' }
+        $row.Cells['Series'].Value = $newSeries
+        if ($row.Tag) { $row.Tag.Series = $newSeries }
     }
 })
 $grid.Add_CurrentCellDirtyStateChanged({ if ($grid.IsCurrentCellDirty) { $grid.CommitEdit('Commit') } })
@@ -241,6 +252,17 @@ $saveButton.Size = New-Object System.Drawing.Size(220, 42)
 $saveButton.Anchor = 'Bottom,Left'
 $form.Controls.Add($saveButton)
 
+$selectAllButton = New-Object System.Windows.Forms.Button
+$selectAllButton.Text = '選取目前全部文章'
+$selectAllButton.Location = New-Object System.Drawing.Point(250, 665)
+$selectAllButton.Size = New-Object System.Drawing.Size(175, 42)
+$selectAllButton.Anchor = 'Bottom,Left'
+$selectAllButton.Add_Click({
+    $grid.ClearSelection()
+    foreach ($row in $grid.Rows) { $row.Selected = $true }
+})
+$form.Controls.Add($selectAllButton)
+
 $exitButton = New-Object System.Windows.Forms.Button
 $exitButton.Text = '退出'
 $exitButton.Location = New-Object System.Drawing.Point(843, 665)
@@ -250,9 +272,10 @@ $exitButton.Add_Click({ $form.Close() })
 $form.Controls.Add($exitButton)
 
 $saveButton.Add_Click({
+    [void]$grid.EndEdit()
     $changed = @($script:AllPosts | Where-Object { $_.Category -ne $_.OriginalCategory -or $_.Series -ne $_.OriginalSeries })
     if ($changed.Count -eq 0) {
-        [System.Windows.Forms.MessageBox]::Show('目前沒有分類變更。', '批次修改分類', 'OK', 'Information') | Out-Null
+        [System.Windows.Forms.MessageBox]::Show('目前沒有分類或專題變更。', '批次修改分類與專題', 'OK', 'Information') | Out-Null
         return
     }
     $backupRoot = Join-Path $SiteRoot ("migration-backups\before-category-edit-" + (Get-Date -Format 'yyyyMMdd-HHmmss'))
