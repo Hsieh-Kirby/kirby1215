@@ -1,5 +1,6 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $PostsRoot = Join-Path $SiteRoot "content\posts"
@@ -11,6 +12,7 @@ $ContentRoots = @(
 $StaticRoot = Join-Path $SiteRoot "static"
 $script:SelectedPost = $null
 $script:NewImages = @()
+$script:NewVideos = @()
 $script:NewCover = $null
 
 function Get-SeriesChoices {
@@ -58,6 +60,7 @@ function Format-ArticleParagraphs([string]$Text) {
 }
 
 . (Join-Path $PSScriptRoot "image-tools.ps1")
+. (Join-Path $PSScriptRoot "video-tools.ps1")
 
 function Split-Post([string]$Text) {
     $match = [regex]::Match($Text, '(?s)^---\r?\n(.*?)\r?\n---\r?\n?(.*)$')
@@ -298,13 +301,25 @@ $form.Controls.Add($coverButton)
 $imageButton = New-Object System.Windows.Forms.Button
 $imageButton.Text = "在游標處加入圖片"
 $imageButton.Location = New-Object System.Drawing.Point(540, 98)
-$imageButton.Size = New-Object System.Drawing.Size(165, 34)
+$imageButton.Size = New-Object System.Drawing.Size(150, 34)
 $form.Controls.Add($imageButton)
+
+$videoButton = New-Object System.Windows.Forms.Button
+$videoButton.Text = "在游標處加入影片"
+$videoButton.Location = New-Object System.Drawing.Point(705, 98)
+$videoButton.Size = New-Object System.Drawing.Size(155, 34)
+$form.Controls.Add($videoButton)
+
+$youtubeButton = New-Object System.Windows.Forms.Button
+$youtubeButton.Text = "插入 YouTube"
+$youtubeButton.Location = New-Object System.Drawing.Point(875, 98)
+$youtubeButton.Size = New-Object System.Drawing.Size(145, 34)
+$form.Controls.Add($youtubeButton)
 
 $imageStatus = New-Object System.Windows.Forms.Label
 $imageStatus.Text = ""
-$imageStatus.Location = New-Object System.Drawing.Point(720, 105)
-$imageStatus.Size = New-Object System.Drawing.Size(360, 24)
+$imageStatus.Location = New-Object System.Drawing.Point(1030, 105)
+$imageStatus.Size = New-Object System.Drawing.Size(55, 24)
 $form.Controls.Add($imageStatus)
 
 $bodyBox = New-Object System.Windows.Forms.RichTextBox
@@ -388,6 +403,7 @@ $postList.Add_SelectedIndexChanged({
     $seriesBox.Text = $series
     $bodyBox.Text = $parts.Body.TrimEnd()
     $script:NewImages = @()
+    $script:NewVideos = @()
     $script:NewCover = $null
     $imageStatus.Text = "已載入：$($script:SelectedPost.Title)"
     Refresh-ImagePreviewList $parts.FrontMatter $parts.Body
@@ -426,6 +442,44 @@ $imageButton.Add_Click({
     }
 })
 
+$videoButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇內文影片（可複選；單檔上限 95 MB）"
+    $dialog.Filter = "網頁影片|*.mp4;*.webm;*.ogg"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = @()
+        foreach ($file in $dialog.FileNames) {
+            $fileInfo = Get-Item -LiteralPath $file
+            if ($fileInfo.Length -gt 95MB) {
+                Show-ErrorMessage "影片 $($fileInfo.Name) 超過 95 MB，請先壓縮後再選擇。"
+                continue
+            }
+            $script:NewVideos += $file
+            $markers += ("[[NEWVIDEO:{0:d3}]]" -f $script:NewVideos.Count)
+        }
+        if ($markers.Count -gt 0) {
+            $bodyBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+            $bodyBox.Focus()
+            $imageStatus.Text = "新圖片 $($script:NewImages.Count)／新影片 $($script:NewVideos.Count)"
+        }
+    }
+})
+
+$youtubeButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
+    $url = [Microsoft.VisualBasic.Interaction]::InputBox("請貼上 YouTube 影片網址（支援一般網址、分享短網址與 Shorts）：", "插入 YouTube 影片", "")
+    if ([string]::IsNullOrWhiteSpace($url)) { return }
+    try {
+        . (Join-Path $PSScriptRoot "video-tools.ps1")
+        $youtubeHtml = New-YouTubeHtml -Url $url -Title $titleBox.Text.Trim()
+        $bodyBox.SelectedText = "`r`n`r`n$youtubeHtml`r`n`r`n"
+        $imageStatus.Text = "已插入"
+        $bodyBox.Focus()
+    } catch { Show-ErrorMessage $_.Exception.Message }
+})
+
 $saveButton.Add_Click({
     if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
     try {
@@ -445,7 +499,10 @@ $saveButton.Add_Click({
         $assetKey = "edit-" + (Get-Date -Format "yyyyMMdd-HHmmss")
         $assetDir = Join-Path $SiteRoot ("static\images\posts\" + $assetKey)
         $webDir = "/kirby1215/images/posts/" + $assetKey
+        $videoDir = Join-Path $SiteRoot ("static\videos\posts\" + $assetKey)
+        $videoWebDir = "/kirby1215/videos/posts/" + $assetKey
         if ($script:NewCover -or $script:NewImages.Count -gt 0) { New-Item -ItemType Directory -Path $assetDir -Force | Out-Null }
+        if ($script:NewVideos.Count -gt 0) { New-Item -ItemType Directory -Path $videoDir -Force | Out-Null }
 
         if ($script:NewCover) {
             $newCoverPath = [string]$script:NewCover
@@ -463,6 +520,13 @@ $saveButton.Add_Click({
             $marker = "[[NEWIMAGE:{0:d3}]]" -f ($i + 1)
             $markdown = "![$($titleBox.Text.Trim())]($webDir/$($result.FileName))"
             $body = $body.Replace($marker, $markdown)
+        }
+
+        for ($i = 0; $i -lt $script:NewVideos.Count; $i++) {
+            $result = Save-WebVideo -Source ([string]$script:NewVideos[$i]) -DestinationBase (Join-Path $videoDir ("video-{0:d3}" -f ($i + 1)))
+            $marker = "[[NEWVIDEO:{0:d3}]]" -f ($i + 1)
+            $videoPath = "$videoWebDir/$($result.FileName)"
+            $body = $body.Replace($marker, (New-VideoHtml -WebPath $videoPath -Title $titleBox.Text.Trim()))
         }
 
         $backup = Join-Path $SiteRoot ("migration-backups\edited-posts\" + (Get-Date -Format "yyyyMMdd-HHmmss"))

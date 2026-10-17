@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ .Title }}｜{{ .Site.Title }}</title>
+    <link rel="canonical" href="{{ .Permalink }}">
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+</head>
+<body>
+{{ partial "site-header.html" . }}
+<div class="page-layout">
+    <main class="article-main">
+        <h1 class="page-title">{{ .Title }}</h1>
+        {{ with .Content }}<div class="series-intro">{{ . }}</div>{{ end }}
+        {{ if .Sections }}
+        <div class="archive-groups">
+            {{ range .Sections.ByWeight }}
+            <section class="archive-group">
+                <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+                <p>{{ with .Description }}{{ . }} · {{ end }}共 {{ len .RegularPagesRecursive }} 篇</p>
+            </section>
+            {{ end }}
+        </div>
+        {{ else }}
+        <div class="post-list">
+            {{ range .RegularPages.ByTitle }}
+            {{ $page := . }}
+            <article class="post-card">
+                {{ with .Params.legacy_cover }}
+                <a class="post-thumbnail" href="{{ $page.RelPermalink }}" aria-label="閱讀：{{ $page.Title }}">
+                    <img src="{{ . | relURL }}" alt="{{ $page.Title }}" loading="lazy">
+                </a>
+                {{ end }}
+                <p class="post-categories">舊站典藏{{ with .Params.legacy_author }} · {{ . }}{{ end }}</p>
+                <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+                {{ with .Params.legacy_provenance }}<p class="post-summary legacy-card-source">來源／出處：{{ . }}</p>{{ end }}
+                {{ with .Params.legacy_original_date }}<p class="post-summary">原發表時間：{{ . }}</p>{{ end }}
+                <a class="read-more" href="{{ .RelPermalink }}">閱讀原文</a>
+            </article>
+            {{ end }}
+        </div>
+        {{ end }}
+    </main>
+    <div class="sidebar-column">
+        {{ partial "site-search.html" . }}
+        {{ partial "sidebar.html" . }}
+    </div>
+</div>
+{{ partial "site-footer.html" . }}
+</body>
+</html>

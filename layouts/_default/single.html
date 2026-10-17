@@ -15,6 +15,13 @@
             <header class="article-header">
                 <h1>{{ .Title }}</h1>
                 <p class="article-meta">
+                    {{ if .Params.legacy_archive }}
+                    <span>舊站典藏</span>
+                    {{ with .Params.legacy_category }}<span>原分類：{{ . }}</span>{{ end }}
+                    {{ with .Params.legacy_author }}<span>作者／講者／譯者：{{ . }}</span>{{ end }}
+                    {{ with .Params.legacy_provenance }}<span class="legacy-provenance">來源／出處：{{ . }}</span>{{ end }}
+                    {{ with .Params.legacy_original_date }}<span>原發表時間：{{ . }}</span>{{ end }}
+                    {{ else }}
                     {{ if eq .Section "itsuwa" }}
                     <span>天理教教祖傳逸話篇　第 {{ .Params.episode }} 則</span>
                     {{ else if eq .Section "japan" }}
@@ -26,10 +33,29 @@
                     {{ with .GetTerms "series" }}
                     <span>專題：{{ range $index, $term := . }}{{ if $index }}、{{ end }}<a href="{{ $term.RelPermalink }}">{{ $term.LinkTitle }}</a>{{ end }}</span>
                     {{ end }}
+                    {{ end }}
                 </p>
                 {{ partial "view-counter.html" . }}
             </header>
-            {{ if .Params.series_directory }}
+            {{ if .Params.legacy_archive }}
+            {{ with .Params.legacy_cover }}
+            <figure class="legacy-cover"><img src="{{ . | relURL }}" alt="{{ $.Title }}" loading="eager"></figure>
+            {{ end }}
+            <div class="legacy-notice">
+                <strong>舊站典藏</strong>
+                <p>本文移植自早期 nettenrikyo 網站，內容與圖片已套用目前網站版面。</p>
+            </div>
+            {{ if .Params.legacy_download }}
+            <div class="legacy-download">
+                <p>這份舊站資料是可下載文件，請使用下方連結開啟或下載。</p>
+                <a href="{{ .Params.legacy_source | relURL }}">下載「{{ .Title }}」</a>
+            </div>
+            {{ else if strings.HasSuffix .Params.legacy_original_path ".pdf" }}
+            <div class="legacy-frame-wrap"><iframe class="legacy-frame" src="{{ .Params.legacy_source | relURL }}" title="{{ .Title }} PDF"></iframe></div>
+            {{ else }}
+            <div class="article-content legacy-content">{{ .Content }}</div>
+            {{ end }}
+            {{ else if .Params.series_directory }}
             <div class="article-content book-landing">
                 <p>本內容已整理為按鈕式專題目錄，包含第一號至第十七號、號外與簡易註釋。</p>
                 {{ with .GetTerms "series" }}<p><a class="book-directory-link" href="{{ (index . 0).RelPermalink }}">開啟御筆先原文目錄</a></p>{{ end }}

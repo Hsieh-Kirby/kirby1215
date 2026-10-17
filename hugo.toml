@@ -52,6 +52,22 @@ url = '/series/'
 weight = 55
 
 [[menus.main]]
+name = '舊站典藏'
+url = '/archive/'
+weight = 57
+
+[[menus.main]]
 name = '關於'
 url = '/about/'
 weight = 60
+
+[module]
+
+[[module.mounts]]
+source = 'static'
+target = 'static'
+
+[[module.mounts]]
+source = 'nettenrikyo'
+target = 'static/legacy/nettenrikyo'
+excludeFiles = ['*.html', '**/*.html', '*.md', '**/*.md', '*.csv', '**/*.csv', '*.txt', '**/*.txt']

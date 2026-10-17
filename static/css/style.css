@@ -209,6 +209,57 @@ a { color: var(--accent-dark); }
 .pagination a { color: var(--accent); text-decoration: none; }
 .article-meta a { color: var(--muted); text-underline-offset: 3px; }
 
+.article-video { margin: 2rem 0; }
+.article-video video { display: block; width: 100%; max-height: 75vh; background: #111; }
+.youtube-video { position: relative; width: 100%; margin: 2rem 0; padding-top: 56.25%; overflow: hidden; background: #111; }
+.youtube-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.legacy-notice { margin: 0 0 24px; padding: 18px 20px; border-left: 4px solid var(--accent); background: var(--paper-soft); }
+.legacy-provenance { flex-basis: 100%; }
+.legacy-cover { margin: 0 0 28px; }
+.legacy-cover img { display: block; width: 100%; max-height: 520px; object-fit: contain; background: var(--paper-soft); }
+.legacy-notice strong { color: var(--accent); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; }
+.legacy-notice p { margin: 5px 0 0; font-size: 15px; }
+.legacy-frame-wrap { width: 100%; overflow-x: auto; }
+.legacy-frame { display: block; width: 100%; min-height: 480px; border: 0; background: transparent; }
+.legacy-content table { display: block; width: 100% !important; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.legacy-content td { max-width: 100%; }
+.legacy-content img { max-width: 100%; height: auto; }
+.legacy-content {
+    font-family: "PMingLiU", "新細明體", "Noto Serif TC", "Source Han Serif TC", serif;
+    font-size: 18px;
+    line-height: 30px;
+}
+.legacy-content p { margin: 1em 0; text-indent: 0; }
+.legacy-content .style29 { font-size: 28px; line-height: 1.4; }
+.legacy-content .style30 { font-size: 18px; line-height: 30px; }
+.legacy-content p.style30:not([align="center"]):not([align="right"]) > br {
+    display: block;
+    content: "";
+    margin-top: .7em;
+}
+.legacy-resource-page h2 { margin-bottom: .65em; }
+.legacy-resource-page h3 { margin-top: 1.35em; }
+.legacy-resource-table-wrap { width: 100%; overflow-x: auto; }
+.legacy-content .legacy-resource-table { display: table; width: 100% !important; min-width: 620px; table-layout: fixed; border-collapse: collapse; }
+.legacy-resource-table th,
+.legacy-resource-table td { padding: 14px 12px; border: 1px solid rgba(2, 62, 71, .32); text-align: center; vertical-align: middle; }
+.legacy-resource-table th { background: #dfd5c7; color: var(--ink); font-size: 20px; font-weight: 500; }
+.legacy-resource-table td { background: #f7f2ea; }
+.legacy-resource-table tr:nth-child(even) td { background: #eee6da; }
+.legacy-resource-table a { display: inline-block; color: var(--accent-dark); font-weight: 600; }
+.legacy-content .missing-legacy-file { color: var(--muted); cursor: not-allowed; pointer-events: none; text-decoration: line-through; }
+.legacy-content .missing-legacy-file::after { content: "（原始檔案缺失）"; margin-left: .3em; font-size: .85em; }
+.legacy-download { padding: 24px; border: 1px solid var(--line); background: #fffdf9; }
+.legacy-download p { margin: 0 0 16px; }
+.legacy-download a { display: inline-block; padding: 10px 18px; background: var(--accent); color: #fff; text-decoration: none; }
+.archive-groups { display: grid; gap: 16px; }
+.archive-group { padding: 22px 24px; border: 1px solid var(--line); background: var(--paper-soft); }
+.archive-group h2 { margin: 0 0 8px; font-size: 25px; font-weight: 500; }
+.archive-group h2 a { color: var(--ink); text-decoration: none; }
+.archive-group p { margin: 0; color: var(--muted); font-size: 15px; }
+.legacy-card-source { margin-bottom: 5px; color: var(--muted); font-size: 15px; }
+
 .site-footer { max-width: 1180px; margin: 0 auto 32px; padding: 22px 36px; background: #d8cfc3; color: var(--ink); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 13px; }
 .site-footer p { margin: 0; }
 

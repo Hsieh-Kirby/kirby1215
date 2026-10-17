@@ -1,9 +1,11 @@
 ﻿Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $script:CoverFile = $null
 $script:BodyImages = @()
+$script:BodyVideos = @()
 $script:LastPreviewUrl = "http://localhost:1313/kirby1215/"
 
 function Get-SeriesChoices {
@@ -186,6 +188,8 @@ function Save-WebImage([string]$Source, [string]$DestinationBase) {
     }
 }
 
+. (Join-Path $PSScriptRoot "video-tools.ps1")
+
 function Find-Hugo {
     $command = Get-Command hugo -ErrorAction SilentlyContinue
     if ($command) { return $command.Source }
@@ -342,14 +346,26 @@ $form.Controls.Add($coverStatus)
 
 $imagesButton = New-Object System.Windows.Forms.Button
 $imagesButton.Text = "在游標處加入圖片"
-$imagesButton.Location = New-Object System.Drawing.Point(600, 100)
-$imagesButton.Size = New-Object System.Drawing.Size(135, 34)
+$imagesButton.Location = New-Object System.Drawing.Point(500, 100)
+$imagesButton.Size = New-Object System.Drawing.Size(130, 34)
 $form.Controls.Add($imagesButton)
 
+$videosButton = New-Object System.Windows.Forms.Button
+$videosButton.Text = "在游標處加入影片"
+$videosButton.Location = New-Object System.Drawing.Point(640, 100)
+$videosButton.Size = New-Object System.Drawing.Size(140, 34)
+$form.Controls.Add($videosButton)
+
+$youtubeButton = New-Object System.Windows.Forms.Button
+$youtubeButton.Text = "插入 YouTube"
+$youtubeButton.Location = New-Object System.Drawing.Point(790, 100)
+$youtubeButton.Size = New-Object System.Drawing.Size(125, 34)
+$form.Controls.Add($youtubeButton)
+
 $imagesStatus = New-Object System.Windows.Forms.Label
-$imagesStatus.Text = "先在正文選位置，再按左側按鈕"
-$imagesStatus.Location = New-Object System.Drawing.Point(750, 107)
-$imagesStatus.Size = New-Object System.Drawing.Size(220, 24)
+$imagesStatus.Text = "先選位置"
+$imagesStatus.Location = New-Object System.Drawing.Point(925, 107)
+$imagesStatus.Size = New-Object System.Drawing.Size(65, 24)
 $form.Controls.Add($imagesStatus)
 
 $contentLabel = New-Object System.Windows.Forms.Label
@@ -484,6 +500,42 @@ $imagesButton.Add_Click({
     }
 })
 
+$videosButton.Add_Click({
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇內文影片（可複選；單檔上限 95 MB）"
+    $dialog.Filter = "網頁影片|*.mp4;*.webm;*.ogg"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = New-Object System.Collections.Generic.List[string]
+        foreach ($selectedFile in $dialog.FileNames) {
+            $fileInfo = Get-Item -LiteralPath $selectedFile
+            if ($fileInfo.Length -gt 95MB) {
+                Show-ErrorMessage "影片 $($fileInfo.Name) 超過 95 MB，請先壓縮後再選擇。"
+                continue
+            }
+            $script:BodyVideos += $selectedFile
+            $markers.Add("[[VIDEO:{0:d3}]]" -f $script:BodyVideos.Count)
+        }
+        if ($markers.Count -gt 0) {
+            $contentBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+            $imagesStatus.Text = "圖片 $($script:BodyImages.Count)／影片 $($script:BodyVideos.Count)"
+            $contentBox.Focus()
+        }
+    }
+})
+
+$youtubeButton.Add_Click({
+    $url = [Microsoft.VisualBasic.Interaction]::InputBox("請貼上 YouTube 影片網址（支援一般網址、分享短網址與 Shorts）：", "插入 YouTube 影片", "")
+    if ([string]::IsNullOrWhiteSpace($url)) { return }
+    try {
+        . (Join-Path $PSScriptRoot "video-tools.ps1")
+        $youtubeHtml = New-YouTubeHtml -Url $url -Title $titleBox.Text.Trim()
+        $contentBox.SelectedText = "`r`n`r`n$youtubeHtml`r`n`r`n"
+        $imagesStatus.Text = "已插入"
+        $contentBox.Focus()
+    } catch { Show-ErrorMessage $_.Exception.Message }
+})
+
 $createButton.Add_Click({
     try {
         $title = $titleBox.Text.Trim()
@@ -509,11 +561,16 @@ $createButton.Add_Click({
         $assetKey = Convert-ToSafeAssetKey $slug $date
         $assetDirectory = Join-Path $SiteRoot ("static\images\posts\" + $assetKey)
         $webDirectory = "/kirby1215/images/posts/" + $assetKey
+        $videoDirectory = Join-Path $SiteRoot ("static\videos\posts\" + $assetKey)
+        $videoWebDirectory = "/kirby1215/videos/posts/" + $assetKey
         $coverWebPath = $null
         $imageMarkdown = New-Object System.Collections.Generic.List[string]
 
         if ($script:CoverFile -or $script:BodyImages.Count -gt 0) {
             New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null
+        }
+        if ($script:BodyVideos.Count -gt 0) {
+            New-Item -ItemType Directory -Path $videoDirectory -Force | Out-Null
         }
 
         if ($script:CoverFile) {
@@ -535,6 +592,14 @@ $createButton.Add_Click({
                 Add-Log "$imageName 已自動壓縮：$($imageResult.OriginalKB) KB → $($imageResult.NewKB) KB"
             }
             $number++
+        }
+
+        $videoHtml = New-Object System.Collections.Generic.List[string]
+        for ($videoIndex = 0; $videoIndex -lt $script:BodyVideos.Count; $videoIndex++) {
+            $videoResult = Save-WebVideo ([string]$script:BodyVideos[$videoIndex]) (Join-Path $videoDirectory ("video-{0:d3}" -f ($videoIndex + 1)))
+            $videoPath = "$videoWebDirectory/$($videoResult.FileName)"
+            $videoHtml.Add((New-VideoHtml $videoPath $title))
+            Add-Log "已加入影片 $($videoResult.FileName)（$($videoResult.SizeMB) MB）。"
         }
 
         $frontMatter = @(
@@ -564,6 +629,15 @@ $createButton.Add_Click({
                 $body += $imageMarkdown[$imageIndex]
             }
         }
+        for ($videoIndex = 0; $videoIndex -lt $videoHtml.Count; $videoIndex++) {
+            $marker = "[[VIDEO:{0:d3}]]" -f ($videoIndex + 1)
+            if ($body.Contains($marker)) {
+                $body = $body.Replace($marker, $videoHtml[$videoIndex])
+            } else {
+                if ($body) { $body += "`r`n`r`n" }
+                $body += $videoHtml[$videoIndex]
+            }
+        }
 
         # 封面同時也是文章正文的第一張圖片。
         if ($coverWebPath) {
@@ -582,6 +656,7 @@ $createButton.Add_Click({
         Add-Log "預覽網址：$script:LastPreviewUrl"
         if ($coverWebPath) { Add-Log "已加入封面，並設為文章第一張圖片。" }
         if ($imageMarkdown.Count -gt 0) { Add-Log "已加入 $($imageMarkdown.Count) 張內文圖片。" }
+        if ($videoHtml.Count -gt 0) { Add-Log "已加入 $($videoHtml.Count) 部內文影片；發布時會一併上傳 GitHub。" }
         Show-Info "文章建立完成。`r`n`r`n$postPath`r`n`r`n接著請按「啟動本機預覽」檢查。"
     } catch {
         Show-ErrorMessage "建立文章失敗：`r`n$($_.Exception.Message)"
