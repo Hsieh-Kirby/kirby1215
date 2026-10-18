@@ -24,7 +24,11 @@
         </div>
         {{ end }}
         {{ if .RegularPages }}
-        {{ $paginator := .Paginate (.RegularPages.ByTitle) 12 }}
+        {{ $pages := .RegularPages.ByTitle }}
+        {{ if .Params.legacy_sort_date_desc }}
+            {{ $pages = (.RegularPages.ByParam "legacy_original_date").Reverse }}
+        {{ end }}
+        {{ $paginator := .Paginate $pages 12 }}
         <div class="post-list{{ if .Sections }} archive-direct-posts{{ end }}">
             {{ range $paginator.Pages }}
             {{ $page := . }}
