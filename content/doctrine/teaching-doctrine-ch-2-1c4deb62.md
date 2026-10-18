@@ -1,10 +1,14 @@
 ---
 title: "第二章. 專心拯救之道"
 slug: "teaching-doctrine-ch-2-1c4deb62"
-url: "/archive/doctrine/teaching-doctrine-ch-2-1c4deb62/"
+url: "/doctrine/ch-2/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 2
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-2.html"
 legacy_original_path: "teaching/doctrine/ch-2.html"

@@ -1,10 +1,14 @@
 ---
 title: "第八章. 提升信仰層次"
 slug: "teaching-doctrine-ch-8-c0665de7"
-url: "/archive/doctrine/teaching-doctrine-ch-8-c0665de7/"
+url: "/doctrine/ch-8/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 8
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-8.html"
 legacy_original_path: "teaching/doctrine/ch-8.html"

@@ -1,10 +1,14 @@
 ---
 title: "第七章. 借貸之物"
 slug: "teaching-doctrine-ch-7-3861b349"
-url: "/archive/doctrine/teaching-doctrine-ch-7-3861b349/"
+url: "/doctrine/ch-7/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 7
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-7.html"
 legacy_original_path: "teaching/doctrine/ch-7.html"

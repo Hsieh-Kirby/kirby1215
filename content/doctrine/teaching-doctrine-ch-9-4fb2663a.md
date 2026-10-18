@@ -1,10 +1,14 @@
 ---
 title: "第九章. 用木"
 slug: "teaching-doctrine-ch-9-4fb2663a"
-url: "/archive/doctrine/teaching-doctrine-ch-9-4fb2663a/"
+url: "/doctrine/ch-9/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 9
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-9.html"
 legacy_original_path: "teaching/doctrine/ch-9.html"

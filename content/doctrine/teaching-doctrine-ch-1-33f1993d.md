@@ -1,10 +1,14 @@
 ---
 title: "第一章. 教祖"
 slug: "teaching-doctrine-ch-1-33f1993d"
-url: "/archive/doctrine/teaching-doctrine-ch-1-33f1993d/"
+url: "/doctrine/ch-1/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 1
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-1.html"
 legacy_original_path: "teaching/doctrine/ch-1.html"

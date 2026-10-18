@@ -1,10 +1,14 @@
 ---
 title: "第五章. 典範"
 slug: "teaching-doctrine-ch-5-2b78c8d4"
-url: "/archive/doctrine/teaching-doctrine-ch-5-2b78c8d4/"
+url: "/doctrine/ch-5/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 5
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-5.html"
 legacy_original_path: "teaching/doctrine/ch-5.html"

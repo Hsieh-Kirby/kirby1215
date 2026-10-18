@@ -1,10 +1,14 @@
 ---
 title: "第十章. 康樂生活"
 slug: "teaching-doctrine-ch-10-9ae5e8b4"
-url: "/archive/doctrine/teaching-doctrine-ch-10-9ae5e8b4/"
+url: "/doctrine/ch-10/"
 categories:
-  - "舊站典藏"
-legacy_archive: true
+  - "天理教"
+series:
+  - "教典"
+doctrine_order: 10
+hide_from_lists: true
+legacy_archive: false
 legacy_category: "教典"
 legacy_source: "/legacy/nettenrikyo/teaching/doctrine/ch-10.html"
 legacy_original_path: "teaching/doctrine/ch-10.html"

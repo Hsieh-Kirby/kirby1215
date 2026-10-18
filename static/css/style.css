@@ -170,6 +170,11 @@ a { color: var(--accent-dark); }
 .series-links a { display: inline-flex; align-items: center; gap: 10px; padding: 9px 14px; border: 1px solid var(--line); background: #fffdf9; color: var(--ink); text-decoration: none; }
 .series-links a:hover { color: var(--accent); }
 .series-links small { color: var(--muted); }
+.series-resource-card { flex: 1 1 100%; padding: 15px 17px; border: 1px solid var(--line); background: #fffdf9; }
+.series-resource-card > strong { display: block; margin-bottom: 8px; color: var(--ink); font-size: 20px; font-weight: 600; }
+.series-resource-card p { margin: 4px 0; color: var(--ink); font-size: 16px; }
+.series-resource-card b { font-weight: 600; }
+.series-resource-card a { display: inline; padding: 0; border: 0; background: transparent; color: var(--accent-dark); font-weight: 600; text-decoration: underline; }
 
 .series-intro { margin: -8px 0 26px; padding: 20px 22px; background: var(--paper-soft); }
 .series-intro p { margin: 0 0 13px; }
