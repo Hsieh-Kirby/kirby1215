@@ -1,4 +1,5 @@
 ---
 title: "天理教教祖傳逸話篇"
 description: "收錄天理教教祖傳逸話篇相關文章。"
+hide_from_series_index: true
 ---

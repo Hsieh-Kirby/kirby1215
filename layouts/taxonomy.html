@@ -15,6 +15,9 @@
         <div class="taxonomy-list">
         {{ $isCategoryIndex := eq .Data.Plural "categories" }}
         {{ range .Pages.ByTitle }}
+            {{ if and (eq $.Data.Plural "series") .Params.hide_from_series_index }}
+                {{ continue }}
+            {{ end }}
             {{ $termPages := .Pages }}
             {{ if $isCategoryIndex }}
                 {{ $termPages = where $termPages "Params.hide_from_lists" "ne" true }}
