@@ -1,0 +1,16 @@
+{{- $url := .Destination -}}
+{{- $videoID := "" -}}
+{{- if findRE `(?i)^https?://(www\.)?(youtube\.com|youtu\.be)/` $url -}}
+  {{- $videoID = replaceRE `(?i)^https?://(?:www\.)?youtu\.be/([^?&#/]+).*$` `$1` $url -}}
+  {{- if eq $videoID $url -}}
+    {{- $videoID = replaceRE `(?i)^https?://(?:www\.)?youtube\.com/(?:shorts|live|embed)/([^?&#/]+).*$` `$1` $url -}}
+  {{- end -}}
+  {{- if eq $videoID $url -}}
+    {{- $videoID = replaceRE `(?i)^https?://(?:www\.)?youtube\.com/watch\?(?:[^#]*&)?v=([^&#]+).*$` `$1` $url -}}
+  {{- end -}}
+{{- end -}}
+{{- if and $videoID (ne $videoID $url) -}}
+<span class="youtube-embed"><iframe src="https://www.youtube-nocookie.com/embed/{{ $videoID }}" title="YouTube 影片播放器" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></span>
+{{- else -}}
+<a href="{{ $url | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if strings.HasPrefix $url "http" }} target="_blank" rel="noopener noreferrer"{{ end }}>{{ .Text | safeHTML }}</a>
+{{- end -}}
