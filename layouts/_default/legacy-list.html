@@ -15,7 +15,7 @@
         {{ with .Content }}<div class="series-intro">{{ . }}</div>{{ end }}
         {{ if .Sections }}
         <div class="archive-groups">
-            {{ range .Sections.ByWeight }}
+            {{ range (where .Sections.ByWeight "Params.hide_from_archive_root" "ne" true) }}
             <section class="archive-group">
                 <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
                 <p>{{ with .Description }}{{ . }} · {{ end }}共 {{ len .RegularPagesRecursive }} 篇</p>
