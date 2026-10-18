@@ -33,6 +33,16 @@ function Show-ErrorMessage([string]$Message) {
     [System.Windows.Forms.MessageBox]::Show($Message, "Kirby1215 發文工具", "OK", "Error") | Out-Null
 }
 
+function Set-SelectedAlignment([System.Windows.Forms.RichTextBox]$TextBox, [string]$Alignment) {
+    if ([string]::IsNullOrWhiteSpace($TextBox.SelectedText)) {
+        Show-Info "請先在文章正文中選取要對齊的文字、圖片或影片。"
+        return
+    }
+    $selected = $TextBox.SelectedText.Trim()
+    $TextBox.SelectedText = "{{% align $Alignment %}}`r`n$selected`r`n{{% /align %}}"
+    $TextBox.Focus()
+}
+
 function Convert-ToSafeFileName([string]$Value) {
     $name = $Value.Trim()
     foreach ($char in [System.IO.Path]::GetInvalidFileNameChars()) {
@@ -373,6 +383,27 @@ $contentLabel.Text = "文章正文（段落按 Enter 一次即可；也支援 Ma
 $contentLabel.Location = New-Object System.Drawing.Point(22, 150)
 $contentLabel.AutoSize = $true
 $form.Controls.Add($contentLabel)
+
+$alignLeftButton = New-Object System.Windows.Forms.Button
+$alignLeftButton.Text = "置左"
+$alignLeftButton.Location = New-Object System.Drawing.Point(760, 142)
+$alignLeftButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignLeftButton.Add_Click({ Set-SelectedAlignment $contentBox "left" })
+$form.Controls.Add($alignLeftButton)
+
+$alignCenterButton = New-Object System.Windows.Forms.Button
+$alignCenterButton.Text = "置中"
+$alignCenterButton.Location = New-Object System.Drawing.Point(840, 142)
+$alignCenterButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignCenterButton.Add_Click({ Set-SelectedAlignment $contentBox "center" })
+$form.Controls.Add($alignCenterButton)
+
+$alignRightButton = New-Object System.Windows.Forms.Button
+$alignRightButton.Text = "置右"
+$alignRightButton.Location = New-Object System.Drawing.Point(920, 142)
+$alignRightButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignRightButton.Add_Click({ Set-SelectedAlignment $contentBox "right" })
+$form.Controls.Add($alignRightButton)
 
 $contentBox = New-Object System.Windows.Forms.RichTextBox
 $contentBox.Location = New-Object System.Drawing.Point(22, 177)

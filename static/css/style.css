@@ -353,3 +353,13 @@ a { color: var(--accent-dark); }
   height: 100%;
   border: 0;
 }
+
+.article-align-left { text-align: left; }
+.article-align-center { text-align: center; }
+.article-align-right { text-align: right; }
+
+.article-align img,
+.article-align .youtube-embed,
+.article-align .article-video {
+  display: inline-block;
+}

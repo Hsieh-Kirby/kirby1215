@@ -41,6 +41,16 @@ function Show-ErrorMessage([string]$Message) {
     [System.Windows.Forms.MessageBox]::Show($Message, "Kirby1215 編輯文章", "OK", "Error") | Out-Null
 }
 
+function Set-SelectedAlignment([System.Windows.Forms.RichTextBox]$TextBox, [string]$Alignment) {
+    if ([string]::IsNullOrWhiteSpace($TextBox.SelectedText)) {
+        Show-Info "請先在文章正文中選取要對齊的文字、圖片或影片。"
+        return
+    }
+    $selected = $TextBox.SelectedText.Trim()
+    $TextBox.SelectedText = "{{% align $Alignment %}}`r`n$selected`r`n{{% /align %}}"
+    $TextBox.Focus()
+}
+
 function Format-ArticleParagraphs([string]$Text) {
     if ([string]::IsNullOrWhiteSpace($Text)) { return $Text }
     $normalized = $Text -replace "`r`n?", "`n"
@@ -322,9 +332,36 @@ $imageStatus.Location = New-Object System.Drawing.Point(1030, 105)
 $imageStatus.Size = New-Object System.Drawing.Size(55, 24)
 $form.Controls.Add($imageStatus)
 
+$alignLeftButton = New-Object System.Windows.Forms.Button
+$alignLeftButton.Text = "置左"
+$alignLeftButton.Location = New-Object System.Drawing.Point(415, 145)
+$alignLeftButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignLeftButton.Add_Click({ Set-SelectedAlignment $bodyBox "left" })
+$form.Controls.Add($alignLeftButton)
+
+$alignCenterButton = New-Object System.Windows.Forms.Button
+$alignCenterButton.Text = "置中"
+$alignCenterButton.Location = New-Object System.Drawing.Point(495, 145)
+$alignCenterButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignCenterButton.Add_Click({ Set-SelectedAlignment $bodyBox "center" })
+$form.Controls.Add($alignCenterButton)
+
+$alignRightButton = New-Object System.Windows.Forms.Button
+$alignRightButton.Text = "置右"
+$alignRightButton.Location = New-Object System.Drawing.Point(575, 145)
+$alignRightButton.Size = New-Object System.Drawing.Size(70, 32)
+$alignRightButton.Add_Click({ Set-SelectedAlignment $bodyBox "right" })
+$form.Controls.Add($alignRightButton)
+
+$alignHint = New-Object System.Windows.Forms.Label
+$alignHint.Text = "先選取正文內容，再按對齊"
+$alignHint.Location = New-Object System.Drawing.Point(660, 151)
+$alignHint.Size = New-Object System.Drawing.Size(250, 24)
+$form.Controls.Add($alignHint)
+
 $bodyBox = New-Object System.Windows.Forms.RichTextBox
-$bodyBox.Location = New-Object System.Drawing.Point(415, 145)
-$bodyBox.Size = New-Object System.Drawing.Size(670, 505)
+$bodyBox.Location = New-Object System.Drawing.Point(415, 185)
+$bodyBox.Size = New-Object System.Drawing.Size(670, 465)
 $bodyBox.Anchor = "Top,Bottom,Left,Right"
 $bodyBox.WordWrap = $true
 $form.Controls.Add($bodyBox)

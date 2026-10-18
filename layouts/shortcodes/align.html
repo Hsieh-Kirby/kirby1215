@@ -1,0 +1,7 @@
+{{- $alignment := .Get 0 | default "left" -}}
+{{- if not (in (slice "left" "center" "right") $alignment) -}}
+  {{- $alignment = "left" -}}
+{{- end -}}
+<div class="article-align article-align-{{ $alignment }}">
+  {{- .Inner -}}
+</div>
