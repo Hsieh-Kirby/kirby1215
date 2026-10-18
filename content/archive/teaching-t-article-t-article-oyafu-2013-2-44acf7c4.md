@@ -1,7 +1,7 @@
 ---
 title: "從借貸之理的教理來思考器官移植(盧勝郁)"
 slug: "teaching-t-article-t-article-oyafu-2013-2-44acf7c4"
-url: "/archive/doctrine/teaching-t-article-t-article-oyafu-2013-2-44acf7c4/"
+url: "/archive/teaching-t-article-t-article-oyafu-2013-2-44acf7c4/"
 categories:
   - "舊站典藏"
 legacy_archive: true

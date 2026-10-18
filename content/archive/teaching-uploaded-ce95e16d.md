@@ -1,7 +1,7 @@
 ---
 title: "文告第三號"
 slug: "teaching-uploaded-ce95e16d"
-url: "/archive/doctrine/teaching-uploaded-ce95e16d/"
+url: "/archive/teaching-uploaded-ce95e16d/"
 categories:
   - "舊站典藏"
 legacy_archive: true

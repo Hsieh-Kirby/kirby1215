@@ -1,7 +1,7 @@
 ---
 title: "教祖的苦難"
 slug: "teaching-t-article-t-article-oyasamadificulty-1be326b4"
-url: "/archive/doctrine/teaching-t-article-t-article-oyasamadificulty-1be326b4/"
+url: "/archive/teaching-t-article-t-article-oyasamadificulty-1be326b4/"
 categories:
   - "舊站典藏"
 legacy_archive: true

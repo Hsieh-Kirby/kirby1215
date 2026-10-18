@@ -1,0 +1,24 @@
+{{- $paginator := . -}}
+{{- if gt $paginator.TotalPages 1 -}}
+<nav class="pagination" aria-label="文章分頁">
+    {{ with $paginator.Prev }}
+    <a class="pagination-direction" href="{{ .URL }}" rel="prev">← 上一頁</a>
+    {{ else }}
+    <span class="pagination-direction is-disabled" aria-disabled="true">← 上一頁</span>
+    {{ end }}
+    <div class="pagination-pages" aria-label="選擇頁數">
+        {{ range $paginator.Pagers }}
+            {{ if eq .PageNumber $paginator.PageNumber }}
+            <span class="pagination-number is-current" aria-current="page">{{ .PageNumber }}</span>
+            {{ else }}
+            <a class="pagination-number" href="{{ .URL }}" aria-label="前往第 {{ .PageNumber }} 頁">{{ .PageNumber }}</a>
+            {{ end }}
+        {{ end }}
+    </div>
+    {{ with $paginator.Next }}
+    <a class="pagination-direction" href="{{ .URL }}" rel="next">下一頁 →</a>
+    {{ else }}
+    <span class="pagination-direction is-disabled" aria-disabled="true">下一頁 →</span>
+    {{ end }}
+</nav>
+{{- end -}}

@@ -1,7 +1,7 @@
 ---
 title: "有關「靈魂」的問題(1)"
 slug: "teaching-t-article-tanisato-45-91df5c6b"
-url: "/archive/doctrine/teaching-t-article-tanisato-45-91df5c6b/"
+url: "/archive/teaching-t-article-tanisato-45-91df5c6b/"
 categories:
   - "舊站典藏"
 legacy_archive: true

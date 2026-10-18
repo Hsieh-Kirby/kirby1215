@@ -15,7 +15,8 @@
         <div class="post-list">
         {{ $posts := where .Site.RegularPages "Section" "posts" }}
         {{ $posts = where $posts "Params.hide_from_lists" "ne" true }}
-        {{ range $posts.ByDate.Reverse }}
+        {{ $paginator := .Paginate ($posts.ByDate.Reverse) 12 }}
+        {{ range $paginator.Pages }}
             <article class="post-card">
                 {{ partial "featured-image.html" . }}
                 <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
@@ -26,6 +27,7 @@
             </article>
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
     </main>
     <div class="sidebar-column">
         {{ partial "site-search.html" . }}

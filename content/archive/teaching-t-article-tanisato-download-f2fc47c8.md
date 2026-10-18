@@ -1,7 +1,7 @@
 ---
 title: "谿鄉分教會會報「たにさと」下載"
 slug: "teaching-t-article-tanisato-download-f2fc47c8"
-url: "/archive/doctrine/teaching-t-article-tanisato-download-f2fc47c8/"
+url: "/archive/teaching-t-article-tanisato-download-f2fc47c8/"
 categories:
   - "舊站典藏"
 legacy_archive: true

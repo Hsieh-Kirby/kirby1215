@@ -1,7 +1,7 @@
 ---
 title: "獻誠致力"
 slug: "teaching-c443046c"
-url: "/archive/doctrine/teaching-c443046c/"
+url: "/archive/teaching-c443046c/"
 categories:
   - "舊站典藏"
 legacy_archive: true

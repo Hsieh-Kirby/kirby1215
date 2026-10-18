@@ -1,7 +1,7 @@
 ---
 title: "八種灰塵"
 slug: "teaching-t-article-t-article-dustbasic-131fe417"
-url: "/archive/doctrine/teaching-t-article-t-article-dustbasic-131fe417/"
+url: "/archive/teaching-t-article-t-article-dustbasic-131fe417/"
 categories:
   - "舊站典藏"
 legacy_archive: true

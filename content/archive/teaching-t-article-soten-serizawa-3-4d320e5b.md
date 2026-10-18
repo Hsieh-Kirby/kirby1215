@@ -1,7 +1,7 @@
 ---
 title: "天理教的信仰(最後的教導)"
 slug: "teaching-t-article-soten-serizawa-3-4d320e5b"
-url: "/archive/doctrine/teaching-t-article-soten-serizawa-3-4d320e5b/"
+url: "/archive/teaching-t-article-soten-serizawa-3-4d320e5b/"
 categories:
   - "舊站典藏"
 legacy_archive: true

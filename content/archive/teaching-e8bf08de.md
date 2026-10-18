@@ -1,7 +1,7 @@
 ---
 title: "十全祐護 八種灰塵"
 slug: "teaching-e8bf08de"
-url: "/archive/doctrine/teaching-e8bf08de/"
+url: "/archive/teaching-e8bf08de/"
 categories:
   - "舊站典藏"
 legacy_archive: true

@@ -1,7 +1,7 @@
 ---
 title: "關於「甘露台」之理(1/3)"
 slug: "teaching-t-article-tanisato-57-d1200159"
-url: "/archive/doctrine/teaching-t-article-tanisato-57-d1200159/"
+url: "/archive/teaching-t-article-tanisato-57-d1200159/"
 categories:
   - "舊站典藏"
 legacy_archive: true

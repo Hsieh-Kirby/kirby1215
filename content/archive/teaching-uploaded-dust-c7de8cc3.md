@@ -1,7 +1,7 @@
 ---
 title: "dust"
 slug: "teaching-uploaded-dust-c7de8cc3"
-url: "/archive/doctrine/teaching-uploaded-dust-c7de8cc3/"
+url: "/archive/teaching-uploaded-dust-c7de8cc3/"
 categories:
   - "舊站典藏"
 legacy_archive: true

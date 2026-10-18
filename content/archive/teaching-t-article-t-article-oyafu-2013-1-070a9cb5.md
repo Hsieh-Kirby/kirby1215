@@ -1,7 +1,7 @@
 ---
 title: "成人(黃高政)"
 slug: "teaching-t-article-t-article-oyafu-2013-1-070a9cb5"
-url: "/archive/doctrine/teaching-t-article-t-article-oyafu-2013-1-070a9cb5/"
+url: "/archive/teaching-t-article-t-article-oyafu-2013-1-070a9cb5/"
 categories:
   - "舊站典藏"
 legacy_archive: true

@@ -1,7 +1,7 @@
 ---
 title: "獻誠致力"
 slug: "teaching-b07072e2"
-url: "/archive/doctrine/teaching-b07072e2/"
+url: "/archive/teaching-b07072e2/"
 categories:
   - "舊站典藏"
 legacy_archive: true

@@ -56,51 +56,66 @@
         {{ end }}
 
         {{ if and (eq .Data.Singular "series") (eq .Title "天理教教祖傳逸話篇") }}
+        {{ $paginator := .Paginate (sort .Pages "Params.episode" "asc") 12 }}
         <div class="episode-grid" id="series-post-list" aria-label="天理教教祖傳逸話篇目錄">
-        {{ range sort .Pages "Params.episode" "asc" }}
+        {{ range $paginator.Pages }}
             <a class="episode-button" href="{{ .RelPermalink }}">
                 <strong>第 {{ .Params.episode }} 則</strong>
                 <span>{{ .Title }}</span>
             </a>
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ else if and (eq .Data.Singular "series") (eq .Title "御筆先原文") }}
+        {{ $orderedPages := where .Pages "Params.original_text_order" "ne" nil }}
+        {{ $paginator := .Paginate (sort $orderedPages "Params.original_text_order" "asc") 12 }}
         <div class="guide-grid" id="series-post-list" aria-label="御筆先原文目錄">
-        {{ range sort .Pages "Params.original_text_order" "asc" }}
-            {{ if .Params.original_text_order }}
+        {{ range $paginator.Pages }}
             <a class="chapter-button" href="{{ .RelPermalink }}">
                 <strong>{{ if le .Params.original_text_order 17 }}御筆先原文{{ else if eq .Params.original_text_order 18 }}補充原文{{ else }}查閱工具{{ end }}</strong>
                 <span>{{ .Title }}</span>
             </a>
-            {{ end }}
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ else if and (eq .Data.Singular "series") (eq .Title "御筆先導讀") }}
+        {{ $paginator := .Paginate (sort .Pages "Params.guide_order" "asc") 12 }}
         <div class="guide-grid" id="series-post-list" aria-label="御筆先導讀目錄">
-        {{ range sort .Pages "Params.guide_order" "asc" }}
+        {{ range $paginator.Pages }}
             <a class="chapter-button" href="{{ .RelPermalink }}">
                 <strong>{{ if le .Params.guide_order 4 }}導讀資料{{ else }}御筆先{{ end }}</strong>
                 <span>{{ .Title }}</span>
             </a>
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ else if and (eq .Data.Singular "series") (eq .Title "教典") }}
+        {{ $paginator := .Paginate (sort .Pages "Params.doctrine_order" "asc") 12 }}
         <div class="guide-grid" id="series-post-list" aria-label="教典目錄">
-        {{ range sort .Pages "Params.doctrine_order" "asc" }}
+        {{ range $paginator.Pages }}
             <a class="chapter-button" href="{{ .RelPermalink }}">
                 <strong>教典第 {{ .Params.doctrine_order }} 章</strong>
                 <span>{{ .Title }}</span>
             </a>
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ else if and (eq .Data.Singular "series") (eq .Title "我所認識的日本") }}
-        <div class="book-parts" id="series-post-list" aria-label="我所認識的日本章節目錄">
         {{ $seriesPages := .Pages }}
+        {{ $orderedChapters := slice }}
         {{ range seq 1 5 }}
             {{ $partNumber := . }}
-            {{ $partPages := where $seriesPages "Params.part" $partNumber }}
+            {{ $orderedChapters = $orderedChapters | append (sort (where $seriesPages "Params.part" $partNumber) "Params.chapter_order" "asc") }}
+        {{ end }}
+        {{ $paginator := .Paginate $orderedChapters 12 }}
+        {{ $visiblePages := $paginator.Pages }}
+        <div class="book-parts" id="series-post-list" aria-label="我所認識的日本章節目錄">
+        {{ range seq 1 5 }}
+            {{ $partNumber := . }}
+            {{ $partPages := where $visiblePages "Params.part" $partNumber }}
             {{ $landingPages := where $seriesPages "Params.chapterized_part" $partNumber }}
             {{ $landing := index $landingPages 0 }}
+            {{ if gt (len $partPages) 0 }}
             <section class="book-part">
                 <h2><a href="{{ $landing.RelPermalink }}">{{ $landing.Title }}</a></h2>
                 <div class="chapter-grid">
@@ -112,14 +127,16 @@
                 {{ end }}
                 </div>
             </section>
+            {{ end }}
         {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ else }}
         {{ $termPages := .Pages }}
         {{ if eq .Data.Singular "category" }}
             {{ $termPages = where $termPages "Params.hide_from_lists" "ne" true }}
         {{ end }}
-        {{ $paginator := .Paginate ($termPages.ByDate.Reverse) 10 }}
+        {{ $paginator := .Paginate ($termPages.ByDate.Reverse) 12 }}
         <div class="post-list" id="series-post-list">
         {{ range $paginator.Pages }}
             <article class="post-card">
@@ -132,13 +149,7 @@
         {{ end }}
         </div>
 
-        {{ if gt $paginator.TotalPages 1 }}
-        <nav class="pagination" aria-label="文章分頁">
-            {{ with $paginator.Prev }}<a href="{{ .URL }}">← 上一頁</a>{{ end }}
-            <span>第 {{ $paginator.PageNumber }}／{{ $paginator.TotalPages }} 頁</span>
-            {{ with $paginator.Next }}<a href="{{ .URL }}">下一頁 →</a>{{ end }}
-        </nav>
-        {{ end }}
+        {{ partial "pagination.html" $paginator }}
         {{ end }}
     </main>
     <div class="sidebar-column">

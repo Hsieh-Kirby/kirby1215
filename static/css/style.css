@@ -205,8 +205,13 @@ a { color: var(--accent-dark); }
 .ofudesaki-text p { margin-bottom: 1.35em; line-height: 1.9; }
 .ofudesaki-text br { display: block; content: ""; }
 .post-card[hidden] { display: none; }
-.pagination { display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 28px; padding: 16px; background: var(--paper-soft); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 14px; }
+.pagination { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 28px; padding: 16px; background: var(--paper-soft); font-family: "Microsoft JhengHei", "PingFang TC", sans-serif; font-size: 14px; }
 .pagination a { color: var(--accent); text-decoration: none; }
+.pagination-pages { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 7px; }
+.pagination-number { display: inline-flex; min-width: 36px; height: 36px; align-items: center; justify-content: center; padding: 0 9px; border: 1px solid var(--line); background: #fffdf9; }
+.pagination-number.is-current { border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 700; }
+.pagination-direction { padding: 8px 10px; }
+.pagination-direction.is-disabled { color: var(--muted); opacity: .5; }
 .article-meta a { color: var(--muted); text-underline-offset: 3px; }
 
 .article-video { margin: 2rem 0; }
@@ -254,6 +259,7 @@ a { color: var(--accent-dark); }
 .legacy-download p { margin: 0 0 16px; }
 .legacy-download a { display: inline-block; padding: 10px 18px; background: var(--accent); color: #fff; text-decoration: none; }
 .archive-groups { display: grid; gap: 16px; }
+.archive-direct-posts { margin-top: 28px; }
 .archive-group { padding: 22px 24px; border: 1px solid var(--line); background: var(--paper-soft); }
 .archive-group h2 { margin: 0 0 8px; font-size: 25px; font-weight: 500; }
 .archive-group h2 a { color: var(--ink); text-decoration: none; }

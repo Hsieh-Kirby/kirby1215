@@ -22,9 +22,11 @@
             </section>
             {{ end }}
         </div>
-        {{ else }}
-        <div class="post-list">
-            {{ range .RegularPages.ByTitle }}
+        {{ end }}
+        {{ if .RegularPages }}
+        {{ $paginator := .Paginate (.RegularPages.ByTitle) 12 }}
+        <div class="post-list{{ if .Sections }} archive-direct-posts{{ end }}">
+            {{ range $paginator.Pages }}
             {{ $page := . }}
             <article class="post-card">
                 {{ with .Params.legacy_cover }}
@@ -40,6 +42,7 @@
             </article>
             {{ end }}
         </div>
+        {{ partial "pagination.html" $paginator }}
         {{ end }}
     </main>
     <div class="sidebar-column">
