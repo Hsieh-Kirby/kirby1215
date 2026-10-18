@@ -1,11 +1,11 @@
 ---
 title: "三. 人類生活的根基 「康樂生活」"
 slug: "teaching-t-article-human-3-252abbb6"
-url: "/archive/doctrine/teaching-t-article-human-3-252abbb6/"
+url: "/archive/matsumoto/teaching-t-article-human-3-252abbb6/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/human-3.html"
 legacy_original_path: "teaching/t-article/human-3.html"
 legacy_author: "松本滋"
@@ -52,4 +52,3 @@ legacy_download: false
 <p class="style30"> 比方說，因為有了天才有地。有了夜晚才有白天。有了陰暗才有光明。有左才有右。有男才有女。有上才有下。有縱才有橫。有工作才有休息。有水氣才有暖鋒。就如同這個道理，在眾人之中有比較堅實可靠的人，同樣的也有漫不經心的人。 </p>
 <p class="style30"> 如此可知，不論是自然界或是人間，任何事物都是立足於二者對照的原理之上。如果違背這原理，互相對峙、四分五裂的話，這世界便無法發展躍進。性質相反的二者，為了同一個目和諧共事，這樣才能發揮出真正的力量。雖然是在提倡「二者合一」，但並不是在要求二者必須融合為一。而是希望兩者能夠維持獨自的性質，並能互助互補、互相扶持，去完成共同目標，才是「二者合一」這個真理的真正含義。</p>
 <p class="style30">這<span class="style30">所謂的「天之理」，是父母神所制定的最基本原則，一貫性的統管著宇宙秩序、自然世界與人類社會。人們如果能主動的去配合這個原則，必能體會到充滿了安祥與和諧的康樂生活。          </span>        </p>
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>

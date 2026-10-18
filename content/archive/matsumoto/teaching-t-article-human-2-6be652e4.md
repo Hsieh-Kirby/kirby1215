@@ -1,11 +1,11 @@
 ---
 title: "二. 天理教的世界觀與人觀"
 slug: "teaching-t-article-human-2-6be652e4"
-url: "/archive/doctrine/teaching-t-article-human-2-6be652e4/"
+url: "/archive/matsumoto/teaching-t-article-human-2-6be652e4/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/human-2.html"
 legacy_original_path: "teaching/t-article/human-2.html"
 legacy_author: "松本滋"
@@ -83,4 +83,3 @@ legacy_download: false
 <p class="style30"> 人體皆由神貸之  以何心思用此體       41</p>
 <p class="style30"> 不知人體是借物  其他事理更難悟     137</p>
 <p class="style30"> 總之，這個世界是「神的身軀」，人的身體都是「神的借物」；這兩項教導是基於同一真理，彼此互不可缺。接著在「不知人體是借物  其他事理更難悟」的詩歌中甚至還有提到，如果人們無法無法接納，自己的身體是「神的借物」這道理，就算是受到再怎麼好的教導，或是領悟到什麼好東西，就跟什麼都不懂的人沒兩樣。 </p>
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>

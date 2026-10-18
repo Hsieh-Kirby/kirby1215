@@ -1,11 +1,11 @@
 ---
 title: "四. 天之理與「全能祐護之理」"
 slug: "teaching-t-article-human-4-a2879f7d"
-url: "/archive/doctrine/teaching-t-article-human-4-a2879f7d/"
+url: "/archive/matsumoto/teaching-t-article-human-4-a2879f7d/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/human-4.html"
 legacy_original_path: "teaching/t-article/human-4.html"
 legacy_author: "松本滋"
@@ -80,4 +80,3 @@ legacy_download: false
 <p class="style30">月日亦必納其心　任何拯救皆賜人　９４ </p>
 <p class="style30">            看看最近的社會，人們在物質方面過得非常豐饒，但跟過的幸不幸福並不成正比例。人們經常以自我為中心，為了自身的利益來使用「神的身軀」或是自己的身體，所以才會發生種種的問題。但是雖然知道我們有這種趨勢，但是所謂江山易改本性難移，要改變這個趨勢並不容易。教祖之所以費盡心思來引導我們也是源於「人心難改」。 </p>
 <p class="style30"><span class="style30">祖至今為止，不止以口述來傳達了這個世界和人們的根源、基本做人處事的道理。另外還花費了五十年歲月，以身作則的實踐教理，讓人們能在生活中親近的感受教導。有關此詳細內容會在次章中講述。總而言之，天理教徒門以「典範之道」來稱呼這五十年的歷程。          </span>          </p>
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>

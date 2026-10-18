@@ -1,11 +1,11 @@
 ---
 title: "五. 回歸人類創造本源之道「聖舞」"
 slug: "teaching-t-article-human-5-8e296681"
-url: "/archive/doctrine/teaching-t-article-human-5-8e296681/"
+url: "/archive/matsumoto/teaching-t-article-human-5-8e296681/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/human-5.html"
 legacy_original_path: "teaching/t-article/human-5.html"
 legacy_author: "松本滋"
@@ -45,4 +45,3 @@ legacy_download: false
 地獄和極樂世界的居民面前同樣有張堆滿美食的桌子，用餐時的餐具也都一樣。這故事告訴人們，雖然使用著同樣的筷子，只想把菜夾給自己吃或把菜夾給對方享用，都出自人的一念，但這一念之差則會成為極樂世界與地獄的分水嶺。這極樂世界的情景就是教祖所教導的「康樂世界」。所謂的「康樂世界」就是把父母神授予我們的東西（不只是物品、錢財，也包含能力與立場），不只為了自己，而是要為了社會來貢獻自我。這一來自就會遵循「二者合一即為天理」的法則，人們便會互相幫助，而一同來享受父母神賜予人們的豐饒恩澤。 <br>
 現代社會雖然擁有著豐富的物資，但就酷似地獄的情況，僅為了個人、某公司、某些國家來運用，而導致了今日世上的混亂，並令關係陷入僵局。 <br>
 為了讓陷入人間地獄的眾人獲救，除了讓所有人類回歸生命的泉源、追朔人類本質，徹底改變心態並淨化靈魂之外，別無他法。 </p>
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>

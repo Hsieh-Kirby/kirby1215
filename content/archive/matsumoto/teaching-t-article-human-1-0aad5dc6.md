@@ -1,11 +1,11 @@
 ---
 title: "一. 現代人與宗教"
 slug: "teaching-t-article-human-1-0aad5dc6"
-url: "/archive/doctrine/teaching-t-article-human-1-0aad5dc6/"
+url: "/archive/matsumoto/teaching-t-article-human-1-0aad5dc6/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/human-1.html"
 legacy_original_path: "teaching/t-article/human-1.html"
 legacy_author: "松本滋"
@@ -46,4 +46,3 @@ legacy_download: false
 <p class="style30">比方說，有位先生在百忙之中抽空來參加宗教關聯的講習班。為什麼他會報名呢？想必一定有他的理由。或許他本人對宗教有興趣，或是想要度過有意義的假期，有可能是想從宗教中尋求某些答案等等，每一個人的理由都不大相同。我覺得每個人的動機都不錯。但是，人們為什麼會有求於宗教呢？為什麼會想去聽有關宗教的講習呢？進一步去追尋更深層的理由時，最後我們會得到人們都想要度過更美好人生的答案。既然想要度過美好人生；那麼我問你，為什麼你會想要度過美好的人生呢？這樣一來，我們還是要去發掘更深層的意義。把這個問題追根究底的去發掘根本的意義時，我們一定會碰到這個疑問，「為什麼你要活在這個世界上呢？」總而言之，在追尋某個行為的終極意義時，如果我們一直鑽研下去，必定會碰上有關生死方面的問題。雖然在一般人的日常生活中，並不需要考慮到這麼深奧的層次；但是當你去追求日常中一切行為的終極意義時，必定會碰到有關人類存活在世界上的意義等核心問題。 </p>
 <p class="style30">所謂的宗教就是要去明確所有事物的根源。如果只針對這一點來說，宗教似乎與哲學相似。宗教與哲學的相異之處，在此僅能簡單的加以說明，宗教是具有驅使人們實際採取行動的力量。哲學原本只停留於思考階段的傾向，而宗教是依據最根本、最終極的意義來賦予人們行動的力量。針對這一點看來，如無伴隨實踐的宗教，與其說是宗教，不如說是哲學。相反的，哲學如果時常伴隨著實踐，便可以歸入宗教的範疇內。 </p>
 <p class="style30">雖然對於一般宗教的概念花了點時間加以說明，接下來將把以上的概念為前提，要來述說有關天理教的信仰與思想。 </p>          
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>

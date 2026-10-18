@@ -1,11 +1,11 @@
 ---
 title: "給躊躇於信仰之道的青年朋友"
 slug: "teaching-t-article-young-be70f180"
-url: "/archive/doctrine/teaching-t-article-young-be70f180/"
+url: "/archive/matsumoto/teaching-t-article-young-be70f180/"
 categories:
   - "舊站典藏"
 legacy_archive: true
-legacy_category: "教理文章與資料"
+legacy_category: "松本滋先生相關"
 legacy_source: "/legacy/nettenrikyo/teaching/t-article/young.html"
 legacy_original_path: "teaching/t-article/young.html"
 legacy_author: "松本滋"
@@ -79,4 +79,3 @@ legacy_download: false
 <p class="style30"><br>
 不管各位將來從事何種工作，希望大家都能謹記父母神意，不斷自我精進。 </p>
 <p class="style30">&nbsp;</p>
-<p class="style30" align="center"><a href="shigeru.html">返回松本滋系列-目錄</a></p>
