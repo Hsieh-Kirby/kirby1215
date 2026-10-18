@@ -1,0 +1,14 @@
+{"schema":"openai.presentation.layout/v5","unit":"px","slide":{"id":"sl/i107q5of","index":4,"layout":{"id":"ly/07y1cjyt","name":"Blank"},"backgroundColor":"rgba(249,248,242,1)","position":{"left":0,"top":0,"width":1280,"height":720}},
+"elements":[
+{"id":"sh/qd0bahob","kind":"shape","name":"左側識別線","position":{"left":0,"top":0,"width":15.36,"height":720},"geometry":"rect","fillColor":"#1C5B46","lineWidth":0},
+{"id":"sh/dgbulwnm","kind":"textbox","name":"標題","position":{"left":52.8,"top":30.72,"width":1161.6,"height":48},"text":"出國身分別結構｜原住民人次成長最明顯","style":{"fontSize":33.33,"typeface":"Calibri","color":"#1C5B46","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/cf2tcr61","kind":"textbox","name":"副標題","position":{"left":55.68,"top":87.36,"width":1152,"height":40.32},"text":"以人次比較113與114學年度，三類身分均增加","style":{"fontSize":16,"typeface":"Calibri","color":"#5F6B65","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"tb/m94nadsn","kind":"table","position":{"left":70,"top":158,"width":1140,"height":342},"text":"身分類別\t113學年度\n人次\t114學年度\n人次\t增減\n人次\t成長率\n原住民\t8\t53\t+45\t+562.5%\n其他弱勢\n（114：完善生）\t33\t46\t+13\t+39.4%\n一般身分\t260\t283\t+23\t+8.8%\n總計\t301\t382\t+81\t+26.9%","rows":5,"cols":5},
+{"id":"sh/yhkbe1o7","kind":"shape","name":"重點摘要底色","position":{"left":70,"top":527,"width":1140,"height":104},"geometry":"roundRect","fillColor":"#FFFFFF","lineColor":"#D5DED8","lineWidth":1},
+{"id":"sh/l4bupwny","kind":"textbox","name":"重點標籤","position":{"left":96,"top":548,"width":150,"height":28},"text":"成長差異","style":{"fontSize":18,"typeface":"Calibri","color":"#C18A25","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/032tgr6d","kind":"textbox","name":"重點說明","position":{"left":238,"top":543,"width":930,"height":46},"text":"原住民增加45人次，成長562.5%，增幅遠高於其他弱勢39.4%與一般身分8.8%。","style":{"fontSize":22,"typeface":"Calibri","color":"#223930","bold":true,"alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/n6dcr65o","kind":"textbox","name":"口徑說明","position":{"left":238,"top":588,"width":930,"height":26},"text":"註：114學年度「其他弱勢」採其他弱勢完善生口徑；數據為人次，非去重人數。","style":{"fontSize":14,"typeface":"Calibri","color":"#5F6B65","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/m5kbi1oj","kind":"shape","name":"頁尾分隔線","position":{"left":55.68,"top":683.52,"width":1161.6,"height":1.15},"geometry":"rect","fillColor":"#E8EDE8","lineWidth":0},
+{"id":"sh/w32dkbuh","kind":"textbox","name":"頁尾","position":{"left":57.6,"top":689.28,"width":960,"height":17.28},"text":"慈濟大學｜全球事務處｜114學年度衣珠計畫","style":{"fontSize":10.67,"typeface":"Calibri","color":"#5F6B65","alignment":"left"},"geometry":"rect","lineWidth":0},
+{"id":"sh/x4vedgvm","kind":"textbox","name":"頁碼","position":{"left":1152,"top":687.36,"width":52.8,"height":19.2},"text":"05","style":{"fontSize":12,"typeface":"Calibri","color":"#5F6B65","alignment":"right"},"geometry":"rect","lineWidth":0}
+]}
