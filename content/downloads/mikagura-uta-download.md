@@ -1,16 +1,7 @@
 ---
-title: "神樂歌"
-slug: "mikagura-uta"
-categories:
-  - "舊站典藏"
-legacy_archive: true
-legacy_category: "三原典"
-legacy_source: "/legacy/nettenrikyo/triple/uta/uta.html"
-legacy_original_path: "triple/uta/uta.html"
-legacy_author: ""
-legacy_provenance: ""
-legacy_cover: "/legacy/nettenrikyo/triple/uta/images/uta-1.jpg"
-legacy_download: false
+title: "神樂歌下載"
+url: "/tenrikyo/mikagura-uta-download/"
+resource_page: true
 ---
 
 <div class="legacy-resource-page">

@@ -19,11 +19,8 @@
             <h2>相關專題</h2>
             <div class="series-links">
             {{ if eq $category "天理教" }}
-                <div class="series-resource-card">
-                    <strong>御筆先</strong>
-                    <p><b>現代日文＋註解版：</b> <a href="{{ "legacy/nettenrikyo/triple/fude/file/OfudesakiJ.pdf" | relURL }}">下載</a></p>
-                    <p><b>現代日文＋白話文翻譯：</b> <a href="{{ "legacy/nettenrikyo/triple/fude/file/OfudesakiJC.pdf" | relURL }}">單頁版下載</a>　<a href="{{ "legacy/nettenrikyo/triple/fude/file/OfudesakiJCA4.pdf" | relURL }}">雙頁版下載</a></p>
-                </div>
+                <a href="{{ "tenrikyo/ofudesaki-download/" | relURL }}"><span>御筆先下載</span><small>3 個檔案</small></a>
+                <a href="{{ "tenrikyo/mikagura-uta-download/" | relURL }}"><span>神樂歌下載</span><small>11 個檔案</small></a>
             {{ end }}
             {{ range .Site.Taxonomies.series.ByCount }}
                 {{ $matched := where .Pages "Params.categories" "intersect" (slice $category) }}

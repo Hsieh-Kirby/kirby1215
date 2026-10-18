@@ -26,6 +26,8 @@
                     <span>天理教教祖傳逸話篇　第 {{ .Params.episode }} 則</span>
                     {{ else if eq .Section "doctrine" }}
                     <span>天理教教典　第 {{ .Params.doctrine_order }} 章</span>
+                    {{ else if .Params.resource_page }}
+                    <span>天理教相關資料</span>
                     {{ else if eq .Section "japan" }}
                     <span>{{ .Params.part_title }}　第 {{ .Params.chapter }} 章</span>
                     {{ else }}
