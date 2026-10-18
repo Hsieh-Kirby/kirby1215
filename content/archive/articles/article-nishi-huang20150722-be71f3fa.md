@@ -1,5 +1,5 @@
 ---
-title: "以熱忱的心關心周遭的人―淺談北捷隨機砍人事件"
+title: "以熱忱的心關心周遭的人―淺談北捷隨機砍人事件(黃登洲)"
 slug: "article-nishi-huang20150722-be71f3fa"
 url: "/archive/articles/article-nishi-huang20150722-be71f3fa/"
 categories:

@@ -1,5 +1,5 @@
 ---
-title: "NHK報導整理 疾病根源在心田"
+title: "NHK報導整理 疾病根源在心田(黃登洲)"
 slug: "article-nishi-nhk-health-2e6d6ed7"
 url: "/archive/articles/article-nishi-nhk-health-2e6d6ed7/"
 categories:

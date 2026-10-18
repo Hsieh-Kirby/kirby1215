@@ -1,5 +1,5 @@
 ---
-title: "保持康樂的心情－減少路怒症的發生"
+title: "保持康樂的心情－減少路怒症的發生(黃登洲)"
 slug: "article-nishi-huang20150718-c8efa0b9"
 url: "/archive/articles/article-nishi-huang20150718-c8efa0b9/"
 categories:

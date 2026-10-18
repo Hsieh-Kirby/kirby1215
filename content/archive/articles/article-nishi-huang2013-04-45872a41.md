@@ -1,5 +1,5 @@
 ---
-title: "信仰世代傳承(神殿講話)"
+title: "信仰世代傳承(神殿講話，黃登洲)"
 slug: "article-nishi-huang2013-04-45872a41"
 url: "/archive/articles/article-nishi-huang2013-04-45872a41/"
 categories:

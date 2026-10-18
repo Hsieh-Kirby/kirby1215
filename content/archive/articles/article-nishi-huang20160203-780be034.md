@@ -1,5 +1,5 @@
 ---
-title: "天理歸參紀行NO.2(2016/1/26～27)"
+title: "天理歸參紀行NO.2(黃登洲，2016/1/26～27)"
 slug: "article-nishi-huang20160203-780be034"
 url: "/archive/articles/article-nishi-huang20160203-780be034/"
 categories:

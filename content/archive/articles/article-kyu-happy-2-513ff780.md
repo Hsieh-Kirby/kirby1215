@@ -1,5 +1,5 @@
 ---
-title: "最終教義(2)"
+title: "最終教義(2)(邱義弘譯)"
 slug: "article-kyu-happy-2-513ff780"
 url: "/archive/articles/article-kyu-happy-2-513ff780/"
 categories:

@@ -1,5 +1,5 @@
 ---
-title: "至少實踐為他人設想之事(白木原嘉彥)"
+title: "至少實踐為他人設想之事(白木原嘉彥，黃登洲譯)"
 slug: "article-nishi-other-shiraki-e2444f12"
 url: "/archive/articles/article-nishi-other-shiraki-e2444f12/"
 categories:

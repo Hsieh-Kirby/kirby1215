@@ -1,5 +1,5 @@
 ---
-title: "勵行播香拯救 實現康樂生活世界(神殿講話)"
+title: "勵行播香拯救 實現康樂生活世界(神殿講話，黃登洲)"
 slug: "article-nishi-huang2014-11-864b0e78"
 url: "/archive/articles/article-nishi-huang2014-11-864b0e78/"
 categories:

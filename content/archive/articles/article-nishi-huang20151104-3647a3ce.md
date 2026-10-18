@@ -1,5 +1,5 @@
 ---
-title: "天理歸參紀行 NO.1(2015/10/26)"
+title: "天理歸參紀行 NO.1(黃登洲，2015/10/26)"
 slug: "article-nishi-huang20151104-3647a3ce"
 url: "/archive/articles/article-nishi-huang20151104-3647a3ce/"
 categories:

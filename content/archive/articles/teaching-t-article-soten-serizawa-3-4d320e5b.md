@@ -1,5 +1,5 @@
 ---
-title: "天理教的信仰(最後的教導)"
+title: "天理教的信仰(最後的教導)(芹澤茂)"
 slug: "teaching-t-article-soten-serizawa-3-4d320e5b"
 url: "/archive/teaching-t-article-soten-serizawa-3-4d320e5b/"
 categories:

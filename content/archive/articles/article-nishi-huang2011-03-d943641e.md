@@ -1,5 +1,5 @@
 ---
-title: "宇宙皆神軀(神殿講話)"
+title: "宇宙皆神軀(神殿講話，黃登洲)"
 slug: "article-nishi-huang2011-03-d943641e"
 url: "/archive/articles/article-nishi-huang2011-03-d943641e/"
 categories:
