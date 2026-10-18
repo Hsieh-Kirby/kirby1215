@@ -87,7 +87,7 @@ try {
         & $git push origin main
         if ($LASTEXITCODE -ne 0) { throw "GitHub 上傳失敗；本機內容仍安全保留。" }
 
-        Show-Message "網站資料已成功上傳 GitHub。`r`n`r`nCloudflare Pages 已自動開始建置公開網站，通常幾分鐘後完成。"
+        Show-Message "網站資料已成功上傳 GitHub。`r`n`r`nCloudflare Pages 應會自動開始建置；這個畫面只代表 GitHub 上傳成功，不代表 Cloudflare 已部署完成。請稍候幾分鐘後開啟網站確認新文章。"
     } finally { Pop-Location }
 } catch {
     Show-Message ("發布失敗：`r`n" + $_.Exception.Message) "Error"

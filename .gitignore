@@ -3,6 +3,7 @@ resources/
 .hugo_build.lock
 website.zip
 .tmp-image-compression-test/
+.tmp-archive-build/
 migration-backups/
 migration-logs/
 天理教教祖傳逸話篇_1-200.docx

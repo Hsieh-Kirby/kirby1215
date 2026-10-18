@@ -70,4 +70,4 @@ target = 'static'
 [[module.mounts]]
 source = 'nettenrikyo'
 target = 'static/legacy/nettenrikyo'
-excludeFiles = ['*.html', '**/*.html', '*.md', '**/*.md', '*.csv', '**/*.csv', '*.txt', '**/*.txt']
+excludeFiles = ['*.html', '**/*.html', '*.md', '**/*.md', '*.csv', '**/*.csv', '*.txt', '**/*.txt', 'triple/ask-anser.pdf']
