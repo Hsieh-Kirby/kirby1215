@@ -32,6 +32,7 @@
                     <span>{{ .Params.part_title }}　第 {{ .Params.chapter }} 章</span>
                     {{ else }}
                     <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+                    {{ with .Params.byline }}<span>{{ . }}</span>{{ end }}
                     {{ with .Params.categories }}<span>分類：{{ delimit . "、" }}</span>{{ end }}
                     {{ end }}
                     {{ with .GetTerms "series" }}

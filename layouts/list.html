@@ -21,6 +21,7 @@
                 {{ partial "featured-image.html" . }}
                 <time class="post-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
                 <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+                {{ with .Params.byline }}<p class="post-byline">{{ . }}</p>{{ end }}
                 {{ with .Params.categories }}<p class="post-categories">分類：{{ delimit . "、" }}</p>{{ end }}
                 <p class="post-summary">{{ .Summary | plainify | truncate 150 }}</p>
                 <a class="read-more" href="{{ .RelPermalink }}">繼續閱讀</a>

@@ -25,6 +25,10 @@
 {{- end -}}
 {{- with $featured -}}
 <a class="post-thumbnail" href="{{ $.RelPermalink }}" aria-label="閱讀：{{ $.Title }}">
+    {{- if or (strings.HasPrefix . "https://") (strings.HasPrefix . "http://") -}}
+    <img src="{{ . | safeURL }}" alt="{{ $.Title }}" loading="lazy">
+    {{- else -}}
     <img src="{{ . | relURL }}" alt="{{ $.Title }}" loading="lazy">
+    {{- end -}}
 </a>
 {{- end -}}
