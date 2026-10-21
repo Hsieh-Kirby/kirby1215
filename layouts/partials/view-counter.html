@@ -16,14 +16,55 @@
 (function () {
     const counter = document.currentScript.previousElementSibling;
     if (!counter) return;
-    const url = counter.dataset.counterHost + "/counter/" + encodeURIComponent(window.location.pathname) + ".json";
-    fetch(url)
-        .then(function (response) {
-            if (!response.ok) throw new Error("counter unavailable");
-            return response.json();
-        })
-        .then(function (data) { counter.querySelector("strong").textContent = data.count; })
-        .catch(function () { counter.querySelector("strong").textContent = "統計準備中"; });
+    const output = counter.querySelector("strong");
+    const delays = [300, 700, 1500, 3000, 5000];
+
+    function getTrackedPath() {
+        if (window.goatcounter && window.goatcounter.get_data) {
+            return window.goatcounter.get_data().p;
+        }
+        return window.location.pathname;
+    }
+
+    function loadCount(attempt) {
+        const path = getTrackedPath();
+        const url = counter.dataset.counterHost + "/counter/" + encodeURIComponent(path) + ".json";
+
+        fetch(url, { cache: "no-store" })
+            .then(function (response) {
+                if (!response.ok) throw new Error("counter unavailable");
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data || typeof data.count === "undefined") {
+                    throw new Error("invalid counter response");
+                }
+                output.textContent = data.count;
+            })
+            .catch(function () {
+                if (attempt < delays.length) {
+                    window.setTimeout(function () { loadCount(attempt + 1); }, delays[attempt]);
+                    return;
+                }
+                output.textContent = "暫時無法取得";
+            });
+    }
+
+    // The counter script is loaded asynchronously in the footer. Waiting briefly
+    // avoids a 404 when a newly published page is viewed for the first time.
+    function loadWhenCounterIsReady(attempt) {
+        if (window.goatcounter && window.goatcounter.get_data) {
+            window.setTimeout(function () { loadCount(0); }, delays[0]);
+            return;
+        }
+        if (attempt < 20) {
+            window.setTimeout(function () { loadWhenCounterIsReady(attempt + 1); }, 100);
+            return;
+        }
+        loadCount(0);
+    }
+
+    loadWhenCounterIsReady(0);
 })();
 </script>
 {{ end }}
