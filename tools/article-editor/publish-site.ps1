@@ -69,20 +69,43 @@ try {
     Push-Location $SiteRoot
     try {
         Ensure-GitIdentity $git
+
+        # Check GitHub before creating another local commit. Without this check,
+        # a change published from another computer makes the later push fail as
+        # non-fast-forward and leaves the two copies on different histories.
+        & $git fetch origin main
+        if ($LASTEXITCODE -ne 0) { throw "無法連線到 GitHub。請檢查網路或 GitHub 登入狀態。" }
+
+        $counts = ((& $git rev-list --left-right --count HEAD...origin/main) -join " ").Trim() -split '\s+'
+        if ($LASTEXITCODE -ne 0 -or $counts.Count -lt 2) { throw "無法比較本機與 GitHub 的版本。" }
+        $ahead = [int]$counts[0]
+        $behind = [int]$counts[1]
+
+        if ($behind -gt 0) {
+            if ($ahead -gt 0) {
+                Show-Message "本機與 GitHub 各有尚未合併的版本，為避免覆蓋文章，已停止發布。`r`n`r`n請先處理版本衝突，不要使用強制上傳。" "Warning"
+            } else {
+                Show-Message "GitHub 上有 $behind 個較新版本。`r`n`r`n請先回到網站管理介面按「同步 GitHub 最新資料」，再重新發布。" "Warning"
+            }
+            return
+        }
+
         & $hugo --minify
         if ($LASTEXITCODE -ne 0) { throw "Hugo 建置失敗，尚未發布。" }
 
         $changes = (& $git status --short) -join "`r`n"
         if ([string]::IsNullOrWhiteSpace($changes)) {
-            Show-Message "目前沒有需要發布的新變更。`r`n`r`nGitHub 與 Cloudflare 不會重新建置。"
-            return
+            if ($ahead -eq 0) {
+                Show-Message "目前沒有需要發布的新變更。`r`n`r`nGitHub 與 Cloudflare 不會重新建置。"
+                return
+            }
+        } else {
+            & $git add --all
+            if ($LASTEXITCODE -ne 0) { throw "無法整理待發布檔案。" }
+
+            & $git commit -m ("更新網站 " + (Get-Date -Format "yyyy-MM-dd HH:mm"))
+            if ($LASTEXITCODE -ne 0) { throw "無法建立 Git 版本。" }
         }
-
-        & $git add --all
-        if ($LASTEXITCODE -ne 0) { throw "無法整理待發布檔案。" }
-
-        & $git commit -m ("更新網站 " + (Get-Date -Format "yyyy-MM-dd HH:mm"))
-        if ($LASTEXITCODE -ne 0) { throw "無法建立 Git 版本。" }
 
         & $git push origin main
         if ($LASTEXITCODE -ne 0) { throw "GitHub 上傳失敗；本機內容仍安全保留。" }
