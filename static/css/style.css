@@ -167,7 +167,7 @@ a { color: var(--accent-dark); }
     :is(.site-header, .sidebar-column, .post-card, .pagination, .article-header),
     :is(.site-header, .sidebar-column, .post-card, .pagination, .article-header) :is(h1, h2, h3, p, a, span, time, label, input, button, select, dt, dd, strong),
     .page-title { font-family: var(--reading-font); font-weight: 600; }
-    .article-main .article-content { color: #333333; font-weight: 600; }
+    .article-main .article-content { font-weight: 600; }
     .article-main .article-content strong,
     .article-main .article-content b { font-weight: 700; }
 }
