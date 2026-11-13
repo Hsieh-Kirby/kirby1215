@@ -1,0 +1,23 @@
+<aside class="article-contact" aria-label="私密留言給作者">
+    <h2>私密留言給謝科比</h2>
+    <p>對本文有任何想法，歡迎寫給我。留言會寄到我的信箱，不會公開在文章下方。</p>
+    <form class="contact-form" action="https://formsubmit.co/0932sya@gmail.com" method="post">
+        <input type="hidden" name="_subject" value="讀者留言：{{ .Title }}">
+        <input type="hidden" name="文章標題" value="{{ .Title }}">
+        <input type="hidden" name="文章連結" value="{{ .Permalink }}">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="{{ "contact-thanks/" | absURL }}">
+        <div class="contact-trap" aria-hidden="true">
+            <label>請留白<input type="text" name="_honey" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <label for="contact-name">稱呼</label>
+        <input id="contact-name" name="稱呼" type="text" autocomplete="name" maxlength="80" required>
+        <label for="contact-email">回覆信箱</label>
+        <input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+        <label for="contact-message">留言內容</label>
+        <textarea id="contact-message" name="留言內容" rows="6" maxlength="10000" required></textarea>
+        <p class="contact-privacy">由 FormSubmit 代為寄送。你填寫的稱呼、信箱與留言僅供私下聯絡使用。</p>
+        <button type="submit">寄出私密留言</button>
+    </form>
+    <p class="contact-fallback">也可以<a href="mailto:0932sya@gmail.com?subject={{ printf "讀者意見：%s" .Title | urlquery }}">直接寄信給我</a>。</p>
+</aside>
