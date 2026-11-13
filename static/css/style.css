@@ -153,6 +153,8 @@ a { color: var(--accent-dark); }
 .article-content h2, .article-content h3 { margin: 1.8em 0 .7em; line-height: 1.45; }
 .article-content > .article-textsize { display: block; margin: 1.4em 0 .8em; }
 .article-content > .article-textsize:first-child { margin-top: 0; }
+.article-main .article-content :is(h2, h3, h4, h5, h6),
+.article-main .article-content > .article-textsize { font-weight: 700; }
 .article-content .article-text-black { color: #111111; }
 .article-content .article-text-red { color: #b42318; }
 .article-content .article-text-yellow { color: #9a6700; }
