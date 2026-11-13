@@ -412,6 +412,8 @@ $contentBox.Anchor = "Top,Bottom,Left,Right"
 $contentBox.AcceptsTab = $true
 $contentBox.WordWrap = $true
 $form.Controls.Add($contentBox)
+. (Join-Path $PSScriptRoot "text-formatting.ps1")
+Add-ArticleTextToolbar $form $contentBox 515 142
 
 $draftPreviewTitle = New-Object System.Windows.Forms.Label
 $draftPreviewTitle.Text = "插入圖片預覽"

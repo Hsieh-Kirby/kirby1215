@@ -1,0 +1,5 @@
+{{- $size := .Get 0 | default "125" -}}
+{{- if not (in (slice "125" "150" "200") $size) -}}
+  {{- $size = "125" -}}
+{{- end -}}
+<span style="font-size: {{ $size }}%; line-height: 1.6;">{{ .Inner | markdownify }}</span>

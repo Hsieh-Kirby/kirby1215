@@ -354,7 +354,7 @@ $alignRightButton.Add_Click({ Set-SelectedAlignment $bodyBox "right" })
 $form.Controls.Add($alignRightButton)
 
 $alignHint = New-Object System.Windows.Forms.Label
-$alignHint.Text = "先選取正文內容，再按對齊"
+$alignHint.Text = ""
 $alignHint.Location = New-Object System.Drawing.Point(660, 151)
 $alignHint.Size = New-Object System.Drawing.Size(250, 24)
 $form.Controls.Add($alignHint)
@@ -365,6 +365,8 @@ $bodyBox.Size = New-Object System.Drawing.Size(670, 465)
 $bodyBox.Anchor = "Top,Bottom,Left,Right"
 $bodyBox.WordWrap = $true
 $form.Controls.Add($bodyBox)
+. (Join-Path $PSScriptRoot "text-formatting.ps1")
+Add-ArticleTextToolbar $form $bodyBox 660 145
 
 $previewTitle = New-Object System.Windows.Forms.Label
 $previewTitle.Text = "文章圖片預覽"
