@@ -1,0 +1,11 @@
+{{- $style := .Get 0 | default "black" -}}
+{{- if eq $style "bold" -}}
+<strong>{{ .Inner | markdownify }}</strong>
+{{- else if eq $style "italic" -}}
+<em>{{ .Inner | markdownify }}</em>
+{{- else -}}
+  {{- if not (in (slice "black" "red" "yellow" "green") $style) -}}
+    {{- $style = "black" -}}
+  {{- end -}}
+<span class="article-text-{{ $style }}">{{ .Inner | markdownify }}</span>
+{{- end -}}
