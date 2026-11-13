@@ -1,4 +1,4 @@
-function Set-ArticleTextStyle([System.Windows.Forms.RichTextBox]$TextBox, [string]$Style) {
+﻿function Set-ArticleTextStyle([System.Windows.Forms.RichTextBox]$TextBox, [string]$Style) {
     if ([string]::IsNullOrWhiteSpace($TextBox.SelectedText)) {
         Show-Info "請先選取要設定的文字；副標題請選取整行。"
         return
@@ -36,10 +36,12 @@ function Add-ArticleTextToolbar($Form, $TextBox, [int]$X, [int]$Y) {
     $choices.Items.AddRange(@('副標題', '小標題', '一般段落', '放大 125%', '放大 150%', '放大 200%'))
     $choices.SelectedIndex = 0
     $Form.Controls.Add($choices)
+    $choices.BringToFront()
     $apply = New-Object System.Windows.Forms.Button
     $apply.Text = '套用字體'
     $apply.Location = New-Object System.Drawing.Point(($X + 145), $Y)
     $apply.Size = New-Object System.Drawing.Size(85, 30)
     $apply.Add_Click({ Set-ArticleTextStyle $TextBox ([string]$choices.SelectedItem) }.GetNewClosure())
     $Form.Controls.Add($apply)
+    $apply.BringToFront()
 }
