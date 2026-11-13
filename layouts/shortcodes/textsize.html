@@ -2,4 +2,4 @@
 {{- if not (in (slice "125" "150" "200") $size) -}}
   {{- $size = "125" -}}
 {{- end -}}
-<span style="font-size: {{ $size }}%; line-height: 1.6;">{{ .Inner | markdownify }}</span>
+<span class="article-textsize" style="font-size: {{ $size }}%; line-height: 1.6;">{{ .Inner | markdownify }}</span>

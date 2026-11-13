@@ -151,6 +151,8 @@ a { color: var(--accent-dark); }
 .article-content { overflow-wrap: anywhere; }
 .article-content p { margin: 0 0 1.6em; }
 .article-content h2, .article-content h3 { margin: 1.8em 0 .7em; line-height: 1.45; }
+.article-content > .article-textsize { display: block; margin: 1.4em 0 .8em; }
+.article-content > .article-textsize:first-child { margin-top: 0; }
 .article-content img { display: block; max-width: 100%; height: auto; margin: 28px auto; }
 .article-content iframe { max-width: 100%; }
 .article-content a { text-underline-offset: 3px; }
