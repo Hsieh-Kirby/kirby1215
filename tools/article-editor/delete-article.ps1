@@ -33,7 +33,7 @@ function Get-PostInfo([System.IO.FileInfo]$File) {
     }
 }
 
-function Get-LocalImageReferences([string]$Content) {
+function Get-LocalAssetReferences([string]$Content) {
     $references = New-Object System.Collections.Generic.List[string]
     foreach ($match in [regex]::Matches($Content, '!\[[^\]]*\]\(([^)]+)\)')) {
         $references.Add($match.Groups[1].Value.Trim('<', '>'))
@@ -42,6 +42,9 @@ function Get-LocalImageReferences([string]$Content) {
         $references.Add($match.Groups[1].Value.Trim())
     }
     foreach ($match in [regex]::Matches($Content, '<img[^>]+src=["'']([^"'']+)["'']', 'IgnoreCase')) {
+        $references.Add($match.Groups[1].Value.Trim())
+    }
+    foreach ($match in [regex]::Matches($Content, '<a[^>]+href=["'']([^"'']+)["'']', 'IgnoreCase')) {
         $references.Add($match.Groups[1].Value.Trim())
     }
     return @($references | Select-Object -Unique)
@@ -53,7 +56,7 @@ function Convert-UrlToStaticPath([string]$Url) {
     $clean = [System.Uri]::UnescapeDataString($clean)
     $clean = $clean -replace '^/kirby1215/', ''
     $clean = $clean -replace '^/', ''
-    if (-not $clean.StartsWith('images/')) { return $null }
+    if (-not ($clean.StartsWith('images/') -or $clean.StartsWith('files/'))) { return $null }
 
     $relative = $clean.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
     $candidate = [System.IO.Path]::GetFullPath((Join-Path $StaticRoot $relative))
@@ -140,8 +143,8 @@ $form.Controls.Add($openBackupButton)
 $postList.Add_SelectedIndexChanged({
     if ($postList.SelectedItem) {
         $selected = $postList.SelectedItem
-        $images = Get-LocalImageReferences $selected.Content
-        $detailsBox.Text = "檔案：$($selected.Path)`r`n找到 $($images.Count) 個本機圖片引用。"
+        $assets = Get-LocalAssetReferences $selected.Content
+        $detailsBox.Text = "檔案：$($selected.Path)`r`n找到 $($assets.Count) 個本機圖片或附件引用。"
     }
 })
 
@@ -170,7 +173,7 @@ $deleteButton.Add_Click({
     }
 
     $selected = $postList.SelectedItem
-    $imageUrls = Get-LocalImageReferences $selected.Content
+    $assetUrls = Get-LocalAssetReferences $selected.Content
     $allOtherContent = Get-ChildItem -LiteralPath $ContentRoots -Filter '*.md' -File |
         Where-Object { $_.Name -ne '_index.md' } |
         Where-Object { $_.FullName -ne $selected.Path } |
@@ -178,17 +181,17 @@ $deleteButton.Add_Click({
     $sharedText = $allOtherContent -join "`n"
 
     $filesToMove = New-Object System.Collections.Generic.List[string]
-    $sharedImages = New-Object System.Collections.Generic.List[string]
-    foreach ($url in $imageUrls) {
-        $imagePath = Convert-UrlToStaticPath $url
-        if (-not $imagePath -or -not (Test-Path -LiteralPath $imagePath)) { continue }
-        if ($sharedText.Contains($url)) { $sharedImages.Add($imagePath) }
-        elseif (-not $filesToMove.Contains($imagePath)) { $filesToMove.Add($imagePath) }
+    $sharedAssets = New-Object System.Collections.Generic.List[string]
+    foreach ($url in $assetUrls) {
+        $assetPath = Convert-UrlToStaticPath $url
+        if (-not $assetPath -or -not (Test-Path -LiteralPath $assetPath)) { continue }
+        if ($sharedText.Contains($url)) { $sharedAssets.Add($assetPath) }
+        elseif (-not $filesToMove.Contains($assetPath)) { $filesToMove.Add($assetPath) }
     }
 
-    $message = "即將移至備份區：`r`n`r`n文章：$($selected.Title)`r`n圖片：$($filesToMove.Count) 個"
-    if ($sharedImages.Count -gt 0) {
-        $message += "`r`n共享圖片：$($sharedImages.Count) 個（為避免其他文章缺圖，將保留）"
+    $message = "即將移至備份區：`r`n`r`n文章：$($selected.Title)`r`n圖片或附件：$($filesToMove.Count) 個"
+    if ($sharedAssets.Count -gt 0) {
+        $message += "`r`n共享圖片或附件：$($sharedAssets.Count) 個（為避免其他文章缺檔，將保留）"
     }
     $message += "`r`n`r`n確定要繼續嗎？"
     $answer = [System.Windows.Forms.MessageBox]::Show($message, "確認刪除", "YesNo", "Warning")

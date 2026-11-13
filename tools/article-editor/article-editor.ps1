@@ -5,7 +5,9 @@ Add-Type -AssemblyName Microsoft.VisualBasic
 $SiteRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $script:CoverFile = $null
 $script:BodyImages = @()
+$script:LinkedImages = @()
 $script:BodyVideos = @()
+$script:Attachments = @()
 $script:LastPreviewUrl = "http://localhost:1313/kirby1215/"
 
 function Get-SeriesChoices {
@@ -199,6 +201,7 @@ function Save-WebImage([string]$Source, [string]$DestinationBase) {
 }
 
 . (Join-Path $PSScriptRoot "video-tools.ps1")
+. (Join-Path $PSScriptRoot "attachment-tools.ps1")
 
 function Find-Hugo {
     $command = Get-Command hugo -ErrorAction SilentlyContinue
@@ -268,6 +271,10 @@ function Refresh-DraftImageList {
     for ($i = 0; $i -lt $script:BodyImages.Count; $i++) {
         $path = [string]$script:BodyImages[$i]
         [void]$draftImageList.Items.Add([pscustomobject]@{ Display = "內文 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
+    }
+    for ($i = 0; $i -lt $script:LinkedImages.Count; $i++) {
+        $path = [string]$script:LinkedImages[$i]
+        [void]$draftImageList.Items.Add([pscustomobject]@{ Display = "圖片連結 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
     }
     if ($draftImageList.Items.Count -gt 0 -and $draftImageList.SelectedIndex -lt 0) { $draftImageList.SelectedIndex = 0 }
 }
@@ -372,6 +379,18 @@ $youtubeButton.Location = New-Object System.Drawing.Point(790, 100)
 $youtubeButton.Size = New-Object System.Drawing.Size(125, 34)
 $form.Controls.Add($youtubeButton)
 
+$imageLinkButton = New-Object System.Windows.Forms.Button
+$imageLinkButton.Text = "加入圖片連結"
+$imageLinkButton.Location = New-Object System.Drawing.Point(500, 142)
+$imageLinkButton.Size = New-Object System.Drawing.Size(145, 34)
+$form.Controls.Add($imageLinkButton)
+
+$attachmentButton = New-Object System.Windows.Forms.Button
+$attachmentButton.Text = "加入 PDF／附件"
+$attachmentButton.Location = New-Object System.Drawing.Point(655, 142)
+$attachmentButton.Size = New-Object System.Drawing.Size(145, 34)
+$form.Controls.Add($attachmentButton)
+
 $imagesStatus = New-Object System.Windows.Forms.Label
 $imagesStatus.Text = "先選位置"
 $imagesStatus.Location = New-Object System.Drawing.Point(925, 107)
@@ -380,34 +399,34 @@ $form.Controls.Add($imagesStatus)
 
 $contentLabel = New-Object System.Windows.Forms.Label
 $contentLabel.Text = "文章正文（段落按 Enter 一次即可；也支援 Markdown）"
-$contentLabel.Location = New-Object System.Drawing.Point(22, 150)
+$contentLabel.Location = New-Object System.Drawing.Point(22, 195)
 $contentLabel.AutoSize = $true
 $form.Controls.Add($contentLabel)
 
 $alignLeftButton = New-Object System.Windows.Forms.Button
 $alignLeftButton.Text = "置左"
-$alignLeftButton.Location = New-Object System.Drawing.Point(760, 142)
+$alignLeftButton.Location = New-Object System.Drawing.Point(760, 187)
 $alignLeftButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignLeftButton.Add_Click({ Set-SelectedAlignment $contentBox "left" })
 $form.Controls.Add($alignLeftButton)
 
 $alignCenterButton = New-Object System.Windows.Forms.Button
 $alignCenterButton.Text = "置中"
-$alignCenterButton.Location = New-Object System.Drawing.Point(840, 142)
+$alignCenterButton.Location = New-Object System.Drawing.Point(840, 187)
 $alignCenterButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignCenterButton.Add_Click({ Set-SelectedAlignment $contentBox "center" })
 $form.Controls.Add($alignCenterButton)
 
 $alignRightButton = New-Object System.Windows.Forms.Button
 $alignRightButton.Text = "置右"
-$alignRightButton.Location = New-Object System.Drawing.Point(920, 142)
+$alignRightButton.Location = New-Object System.Drawing.Point(920, 187)
 $alignRightButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignRightButton.Add_Click({ Set-SelectedAlignment $contentBox "right" })
 $form.Controls.Add($alignRightButton)
 
 $contentBox = New-Object System.Windows.Forms.RichTextBox
-$contentBox.Location = New-Object System.Drawing.Point(22, 177)
-$contentBox.Size = New-Object System.Drawing.Size(968, 370)
+$contentBox.Location = New-Object System.Drawing.Point(22, 222)
+$contentBox.Size = New-Object System.Drawing.Size(968, 325)
 $contentBox.Anchor = "Top,Bottom,Left,Right"
 $contentBox.AcceptsTab = $true
 $contentBox.WordWrap = $true
@@ -533,6 +552,48 @@ $imagesButton.Add_Click({
     }
 })
 
+$imageLinkButton.Add_Click({
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇要用連結分享的圖片（可複選）"
+    $dialog.Filter = "圖片檔|*.jpg;*.jpeg;*.png;*.webp;*.gif;*.heic;*.heif"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = New-Object System.Collections.Generic.List[string]
+        foreach ($selectedFile in $dialog.FileNames) {
+            $script:LinkedImages += $selectedFile
+            $markers.Add("[[IMAGELINK:{0:d3}]]" -f $script:LinkedImages.Count)
+        }
+        $contentBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+        $imagesStatus.Text = "已加入連結"
+        Refresh-DraftImageList
+        Show-DraftImagePreview ([string]$script:LinkedImages[-1])
+        $contentBox.Focus()
+    }
+})
+
+$attachmentButton.Add_Click({
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇 PDF 附件（可複選；單檔上限 25 MB）"
+    $dialog.Filter = "PDF 檔|*.pdf"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = New-Object System.Collections.Generic.List[string]
+        foreach ($selectedFile in $dialog.FileNames) {
+            if ((Get-Item -LiteralPath $selectedFile).Length -gt 25MB) {
+                Show-ErrorMessage "PDF $([System.IO.Path]::GetFileName($selectedFile)) 超過 25 MB，無法加入。"
+                continue
+            }
+            $script:Attachments += $selectedFile
+            $markers.Add("[[ATTACHMENT:{0:d3}]]" -f $script:Attachments.Count)
+        }
+        if ($markers.Count -gt 0) {
+            $contentBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+            $imagesStatus.Text = "已加入 PDF"
+            $contentBox.Focus()
+        }
+    }
+})
+
 $videosButton.Add_Click({
     $dialog = New-Object System.Windows.Forms.OpenFileDialog
     $dialog.Title = "選擇內文影片（可複選；單檔上限 95 MB）"
@@ -594,16 +655,22 @@ $createButton.Add_Click({
         $assetKey = Convert-ToSafeAssetKey $slug $date
         $assetDirectory = Join-Path $SiteRoot ("static\images\posts\" + $assetKey)
         $webDirectory = "/kirby1215/images/posts/" + $assetKey
+        $linkWebDirectory = "/images/posts/" + $assetKey
         $videoDirectory = Join-Path $SiteRoot ("static\videos\posts\" + $assetKey)
         $videoWebDirectory = "/kirby1215/videos/posts/" + $assetKey
+        $fileDirectory = Join-Path $SiteRoot ("static\files\posts\" + $assetKey)
+        $fileWebDirectory = "/files/posts/" + $assetKey
         $coverWebPath = $null
         $imageMarkdown = New-Object System.Collections.Generic.List[string]
 
-        if ($script:CoverFile -or $script:BodyImages.Count -gt 0) {
+        if ($script:CoverFile -or $script:BodyImages.Count -gt 0 -or $script:LinkedImages.Count -gt 0) {
             New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null
         }
         if ($script:BodyVideos.Count -gt 0) {
             New-Item -ItemType Directory -Path $videoDirectory -Force | Out-Null
+        }
+        if ($script:Attachments.Count -gt 0) {
+            New-Item -ItemType Directory -Path $fileDirectory -Force | Out-Null
         }
 
         if ($script:CoverFile) {
@@ -625,6 +692,24 @@ $createButton.Add_Click({
                 Add-Log "$imageName 已自動壓縮：$($imageResult.OriginalKB) KB → $($imageResult.NewKB) KB"
             }
             $number++
+        }
+
+        $imageLinks = New-Object System.Collections.Generic.List[string]
+        for ($linkIndex = 0; $linkIndex -lt $script:LinkedImages.Count; $linkIndex++) {
+            $source = [string]$script:LinkedImages[$linkIndex]
+            $imageResult = Save-WebImage $source (Join-Path $assetDirectory ("linked-image-{0:d3}" -f ($linkIndex + 1)))
+            $imagePath = "$linkWebDirectory/$($imageResult.FileName)"
+            $imageLinks.Add((New-ImageLinkHtml -WebPath $imagePath -DisplayName ([System.IO.Path]::GetFileName($source))))
+            if ($imageResult.Compressed) {
+                Add-Log "$($imageResult.FileName) 已自動壓縮：$($imageResult.OriginalKB) KB → $($imageResult.NewKB) KB"
+            }
+        }
+
+        $attachmentLinks = New-Object System.Collections.Generic.List[string]
+        for ($attachmentIndex = 0; $attachmentIndex -lt $script:Attachments.Count; $attachmentIndex++) {
+            $result = Save-PdfAttachment -Source ([string]$script:Attachments[$attachmentIndex]) -DestinationBase (Join-Path $fileDirectory ("document-{0:d3}" -f ($attachmentIndex + 1)))
+            $attachmentLinks.Add((New-PdfLinksHtml -WebPath "$fileWebDirectory/$($result.FileName)" -DisplayName $result.DisplayName))
+            Add-Log "已加入 PDF $($result.DisplayName)（$($result.SizeMB) MB）。"
         }
 
         $videoHtml = New-Object System.Collections.Generic.List[string]
@@ -671,6 +756,14 @@ $createButton.Add_Click({
                 $body += $videoHtml[$videoIndex]
             }
         }
+        for ($linkIndex = 0; $linkIndex -lt $imageLinks.Count; $linkIndex++) {
+            $marker = "[[IMAGELINK:{0:d3}]]" -f ($linkIndex + 1)
+            $body = $body.Replace($marker, $imageLinks[$linkIndex])
+        }
+        for ($attachmentIndex = 0; $attachmentIndex -lt $attachmentLinks.Count; $attachmentIndex++) {
+            $marker = "[[ATTACHMENT:{0:d3}]]" -f ($attachmentIndex + 1)
+            $body = $body.Replace($marker, $attachmentLinks[$attachmentIndex])
+        }
 
         # 封面同時也是文章正文的第一張圖片。
         if ($coverWebPath) {
@@ -689,6 +782,8 @@ $createButton.Add_Click({
         Add-Log "預覽網址：$script:LastPreviewUrl"
         if ($coverWebPath) { Add-Log "已加入封面，並設為文章第一張圖片。" }
         if ($imageMarkdown.Count -gt 0) { Add-Log "已加入 $($imageMarkdown.Count) 張內文圖片。" }
+        if ($imageLinks.Count -gt 0) { Add-Log "已加入 $($imageLinks.Count) 個圖片連結。" }
+        if ($attachmentLinks.Count -gt 0) { Add-Log "已加入 $($attachmentLinks.Count) 個 PDF 附件。" }
         if ($videoHtml.Count -gt 0) { Add-Log "已加入 $($videoHtml.Count) 部內文影片；發布時會一併上傳 GitHub。" }
         Show-Info "文章建立完成。`r`n`r`n$postPath`r`n`r`n接著請按「啟動本機預覽」檢查。"
     } catch {
@@ -730,68 +825,12 @@ $editArticleButton.Add_Click({
 })
 
 $publishButton.Add_Click({
-    try {
-        $hugo = Find-Hugo
-        if (-not $hugo) {
-            Show-ErrorMessage "找不到 Hugo，無法進行發布前檢查。"
-            return
-        }
-        if (-not (Test-Path -LiteralPath (Join-Path $SiteRoot ".git"))) {
-            Show-ErrorMessage "這個網站尚未連接 GitHub（找不到 .git）。"
-            return
-        }
-        $git = Find-Git
-        if (-not $git) {
-            Show-ErrorMessage "找不到 Git，無法發布到 GitHub。"
-            return
-        }
-
-        Add-Log "正在執行發布前完整建置檢查……"
-        Push-Location $SiteRoot
-        try {
-            & $hugo --minify 2>&1 | ForEach-Object { Add-Log ([string]$_) }
-            if ($LASTEXITCODE -ne 0) {
-                Show-ErrorMessage "Hugo 建置失敗，已停止發布。請先處理記錄中的錯誤。"
-                return
-            }
-
-            $changes = (& $git status --short 2>&1) -join "`r`n"
-            if ([string]::IsNullOrWhiteSpace($changes)) {
-                Show-Info "目前沒有需要發布的新變更。"
-                return
-            }
-
-            $answer = [System.Windows.Forms.MessageBox]::Show(
-                "Hugo 檢查通過。即將把以下變更發布到 GitHub：`r`n`r`n$changes`r`n`r`n確定要繼續嗎？",
-                "確認發布",
-                "YesNo",
-                "Question"
-            )
-            if ($answer -ne "Yes") {
-                Add-Log "已取消發布。"
-                return
-            }
-
-            Ensure-GitIdentity $git
-            & $git add --all
-            & $git commit -m ("新增文章與網站更新 " + (Get-Date -Format "yyyy-MM-dd HH:mm")) 2>&1 | ForEach-Object { Add-Log ([string]$_) }
-            if ($LASTEXITCODE -ne 0) {
-                Show-ErrorMessage "Git 建立版本失敗，尚未上傳。"
-                return
-            }
-            & $git push 2>&1 | ForEach-Object { Add-Log ([string]$_) }
-            if ($LASTEXITCODE -ne 0) {
-                Show-ErrorMessage "GitHub 上傳失敗。文章仍安全保存在本機。"
-                return
-            }
-            Add-Log "GitHub 上傳完成；Cloudflare 正在自動更新。"
-            Show-Info "網站資料已上傳 GitHub，Cloudflare Pages 正在自動更新公開網站。"
-        } finally {
-            Pop-Location
-        }
-    } catch {
-        Show-ErrorMessage "發布失敗：`r`n$($_.Exception.Message)"
-    }
+    Start-Process -FilePath "powershell.exe" -WindowStyle Hidden -ArgumentList @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", (Join-Path $PSScriptRoot "publish-site.ps1")
+    )
+    Add-Log "已開啟安全發布檢查。"
 })
 
 Add-Log "網站位置：$SiteRoot"

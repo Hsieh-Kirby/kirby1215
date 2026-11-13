@@ -12,7 +12,9 @@ $ContentRoots = @(
 $StaticRoot = Join-Path $SiteRoot "static"
 $script:SelectedPost = $null
 $script:NewImages = @()
+$script:NewLinkedImages = @()
 $script:NewVideos = @()
+$script:NewAttachments = @()
 $script:NewCover = $null
 
 function Get-SeriesChoices {
@@ -71,6 +73,7 @@ function Format-ArticleParagraphs([string]$Text) {
 
 . (Join-Path $PSScriptRoot "image-tools.ps1")
 . (Join-Path $PSScriptRoot "video-tools.ps1")
+. (Join-Path $PSScriptRoot "attachment-tools.ps1")
 
 function Split-Post([string]$Text) {
     $match = [regex]::Match($Text, '(?s)^---\r?\n(.*?)\r?\n---\r?\n?(.*)$')
@@ -136,6 +139,10 @@ function Refresh-ImagePreviewList([string]$FrontMatter, [string]$Body) {
     for ($i = 0; $i -lt $script:NewImages.Count; $i++) {
         $path = [string]$script:NewImages[$i]
         [void]$imagePreviewList.Items.Add([pscustomobject]@{ Display = "新圖片 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
+    }
+    for ($i = 0; $i -lt $script:NewLinkedImages.Count; $i++) {
+        $path = [string]$script:NewLinkedImages[$i]
+        [void]$imagePreviewList.Items.Add([pscustomobject]@{ Display = "新圖片連結 $($i + 1)：$([System.IO.Path]::GetFileName($path))"; Path = $path })
     }
     if ($script:NewCover) {
         [void]$imagePreviewList.Items.Insert(0, [pscustomobject]@{ Display = "新封面：$([System.IO.Path]::GetFileName($script:NewCover))"; Path = [string]$script:NewCover })
@@ -326,6 +333,18 @@ $youtubeButton.Location = New-Object System.Drawing.Point(875, 98)
 $youtubeButton.Size = New-Object System.Drawing.Size(145, 34)
 $form.Controls.Add($youtubeButton)
 
+$imageLinkButton = New-Object System.Windows.Forms.Button
+$imageLinkButton.Text = "加入圖片連結"
+$imageLinkButton.Location = New-Object System.Drawing.Point(415, 140)
+$imageLinkButton.Size = New-Object System.Drawing.Size(145, 34)
+$form.Controls.Add($imageLinkButton)
+
+$attachmentButton = New-Object System.Windows.Forms.Button
+$attachmentButton.Text = "加入 PDF／附件"
+$attachmentButton.Location = New-Object System.Drawing.Point(575, 140)
+$attachmentButton.Size = New-Object System.Drawing.Size(150, 34)
+$form.Controls.Add($attachmentButton)
+
 $imageStatus = New-Object System.Windows.Forms.Label
 $imageStatus.Text = ""
 $imageStatus.Location = New-Object System.Drawing.Point(1030, 105)
@@ -334,34 +353,34 @@ $form.Controls.Add($imageStatus)
 
 $alignLeftButton = New-Object System.Windows.Forms.Button
 $alignLeftButton.Text = "置左"
-$alignLeftButton.Location = New-Object System.Drawing.Point(415, 145)
+$alignLeftButton.Location = New-Object System.Drawing.Point(415, 185)
 $alignLeftButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignLeftButton.Add_Click({ Set-SelectedAlignment $bodyBox "left" })
 $form.Controls.Add($alignLeftButton)
 
 $alignCenterButton = New-Object System.Windows.Forms.Button
 $alignCenterButton.Text = "置中"
-$alignCenterButton.Location = New-Object System.Drawing.Point(495, 145)
+$alignCenterButton.Location = New-Object System.Drawing.Point(495, 185)
 $alignCenterButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignCenterButton.Add_Click({ Set-SelectedAlignment $bodyBox "center" })
 $form.Controls.Add($alignCenterButton)
 
 $alignRightButton = New-Object System.Windows.Forms.Button
 $alignRightButton.Text = "置右"
-$alignRightButton.Location = New-Object System.Drawing.Point(575, 145)
+$alignRightButton.Location = New-Object System.Drawing.Point(575, 185)
 $alignRightButton.Size = New-Object System.Drawing.Size(70, 32)
 $alignRightButton.Add_Click({ Set-SelectedAlignment $bodyBox "right" })
 $form.Controls.Add($alignRightButton)
 
 $alignHint = New-Object System.Windows.Forms.Label
-$alignHint.Text = ""
-$alignHint.Location = New-Object System.Drawing.Point(660, 151)
+$alignHint.Text = "先選取正文內容，再按對齊"
+$alignHint.Location = New-Object System.Drawing.Point(660, 191)
 $alignHint.Size = New-Object System.Drawing.Size(250, 24)
 $form.Controls.Add($alignHint)
 
 $bodyBox = New-Object System.Windows.Forms.RichTextBox
-$bodyBox.Location = New-Object System.Drawing.Point(415, 185)
-$bodyBox.Size = New-Object System.Drawing.Size(670, 465)
+$bodyBox.Location = New-Object System.Drawing.Point(415, 225)
+$bodyBox.Size = New-Object System.Drawing.Size(670, 425)
 $bodyBox.Anchor = "Top,Bottom,Left,Right"
 $bodyBox.WordWrap = $true
 $form.Controls.Add($bodyBox)
@@ -442,7 +461,9 @@ $postList.Add_SelectedIndexChanged({
     $seriesBox.Text = $series
     $bodyBox.Text = $parts.Body.TrimEnd()
     $script:NewImages = @()
+    $script:NewLinkedImages = @()
     $script:NewVideos = @()
+    $script:NewAttachments = @()
     $script:NewCover = $null
     $imageStatus.Text = "已載入：$($script:SelectedPost.Title)"
     Refresh-ImagePreviewList $parts.FrontMatter $parts.Body
@@ -478,6 +499,51 @@ $imageButton.Add_Click({
         $parts = Split-Post $script:SelectedPost.Raw
         Refresh-ImagePreviewList $parts.FrontMatter $bodyBox.Text
         Show-ImagePreview ([string]$script:NewImages[-1])
+    }
+})
+
+$imageLinkButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇要用連結分享的圖片（可複選）"
+    $dialog.Filter = "圖片檔|*.jpg;*.jpeg;*.png;*.webp;*.gif;*.heic;*.heif"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = @()
+        foreach ($file in $dialog.FileNames) {
+            $script:NewLinkedImages += $file
+            $markers += ("[[NEWIMAGELINK:{0:d3}]]" -f $script:NewLinkedImages.Count)
+        }
+        $bodyBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+        $bodyBox.Focus()
+        $imageStatus.Text = "已加入圖片連結"
+        $parts = Split-Post $script:SelectedPost.Raw
+        Refresh-ImagePreviewList $parts.FrontMatter $bodyBox.Text
+        Show-ImagePreview ([string]$script:NewLinkedImages[-1])
+    }
+})
+
+$attachmentButton.Add_Click({
+    if (-not $script:SelectedPost) { Show-ErrorMessage "請先選擇文章。"; return }
+    $dialog = New-Object System.Windows.Forms.OpenFileDialog
+    $dialog.Title = "選擇 PDF 附件（可複選；單檔上限 25 MB）"
+    $dialog.Filter = "PDF 檔|*.pdf"
+    $dialog.Multiselect = $true
+    if ($dialog.ShowDialog() -eq "OK") {
+        $markers = @()
+        foreach ($file in $dialog.FileNames) {
+            if ((Get-Item -LiteralPath $file).Length -gt 25MB) {
+                Show-ErrorMessage "PDF $([System.IO.Path]::GetFileName($file)) 超過 25 MB，無法加入。"
+                continue
+            }
+            $script:NewAttachments += $file
+            $markers += ("[[NEWATTACHMENT:{0:d3}]]" -f $script:NewAttachments.Count)
+        }
+        if ($markers.Count -gt 0) {
+            $bodyBox.SelectedText = "`r`n`r`n" + ($markers -join "`r`n`r`n") + "`r`n`r`n"
+            $bodyBox.Focus()
+            $imageStatus.Text = "已加入 PDF"
+        }
     }
 })
 
@@ -538,10 +604,14 @@ $saveButton.Add_Click({
         $assetKey = "edit-" + (Get-Date -Format "yyyyMMdd-HHmmss")
         $assetDir = Join-Path $SiteRoot ("static\images\posts\" + $assetKey)
         $webDir = "/kirby1215/images/posts/" + $assetKey
+        $linkWebDir = "/images/posts/" + $assetKey
         $videoDir = Join-Path $SiteRoot ("static\videos\posts\" + $assetKey)
         $videoWebDir = "/kirby1215/videos/posts/" + $assetKey
-        if ($script:NewCover -or $script:NewImages.Count -gt 0) { New-Item -ItemType Directory -Path $assetDir -Force | Out-Null }
+        $fileDir = Join-Path $SiteRoot ("static\files\posts\" + $assetKey)
+        $fileWebDir = "/files/posts/" + $assetKey
+        if ($script:NewCover -or $script:NewImages.Count -gt 0 -or $script:NewLinkedImages.Count -gt 0) { New-Item -ItemType Directory -Path $assetDir -Force | Out-Null }
         if ($script:NewVideos.Count -gt 0) { New-Item -ItemType Directory -Path $videoDir -Force | Out-Null }
+        if ($script:NewAttachments.Count -gt 0) { New-Item -ItemType Directory -Path $fileDir -Force | Out-Null }
 
         if ($script:NewCover) {
             $newCoverPath = [string]$script:NewCover
@@ -559,6 +629,20 @@ $saveButton.Add_Click({
             $marker = "[[NEWIMAGE:{0:d3}]]" -f ($i + 1)
             $markdown = "![$($titleBox.Text.Trim())]($webDir/$($result.FileName))"
             $body = $body.Replace($marker, $markdown)
+        }
+
+        for ($i = 0; $i -lt $script:NewLinkedImages.Count; $i++) {
+            $source = [string]$script:NewLinkedImages[$i]
+            $result = Save-WebImage -Source $source -DestinationBase (Join-Path $assetDir ("linked-image-{0:d3}" -f ($i + 1)))
+            $marker = "[[NEWIMAGELINK:{0:d3}]]" -f ($i + 1)
+            $imagePath = "$linkWebDir/$($result.FileName)"
+            $body = $body.Replace($marker, (New-ImageLinkHtml -WebPath $imagePath -DisplayName ([System.IO.Path]::GetFileName($source))))
+        }
+
+        for ($i = 0; $i -lt $script:NewAttachments.Count; $i++) {
+            $result = Save-PdfAttachment -Source ([string]$script:NewAttachments[$i]) -DestinationBase (Join-Path $fileDir ("document-{0:d3}" -f ($i + 1)))
+            $marker = "[[NEWATTACHMENT:{0:d3}]]" -f ($i + 1)
+            $body = $body.Replace($marker, (New-PdfLinksHtml -WebPath "$fileWebDir/$($result.FileName)" -DisplayName $result.DisplayName))
         }
 
         for ($i = 0; $i -lt $script:NewVideos.Count; $i++) {
