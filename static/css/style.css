@@ -9,6 +9,7 @@
     --accent-dark: #7a5e2f;
     --line: rgba(84, 67, 52, 0.17);
     --shadow: 0 12px 32px rgba(68, 52, 38, 0.08);
+    --reading-font: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
 }
 
 * { box-sizing: border-box; }
@@ -18,7 +19,7 @@ body {
     margin: 0;
     background: var(--page-bg);
     color: var(--ink);
-    font-family: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
+    font-family: var(--reading-font);
     font-size: 19px;
     line-height: 1.85;
 }
@@ -163,6 +164,9 @@ a { color: var(--accent-dark); }
 .article-content iframe { max-width: 100%; }
 .article-content a { text-underline-offset: 3px; }
 @media (min-width: 851px) {
+    :is(.site-header, .sidebar-column, .post-card, .pagination, .article-header),
+    :is(.site-header, .sidebar-column, .post-card, .pagination, .article-header) :is(h1, h2, h3, p, a, span, time, label, input, button, select, dt, dd, strong),
+    .page-title { font-family: var(--reading-font); font-weight: 600; }
     .article-main .article-content { color: #333333; font-weight: 600; }
     .article-main .article-content strong,
     .article-main .article-content b { font-weight: 700; }
