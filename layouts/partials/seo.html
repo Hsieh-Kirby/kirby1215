@@ -1,0 +1,53 @@
+{{- $url := partial "public-url.html" .RelPermalink -}}
+{{- $title := .Title -}}
+{{- if .IsHome -}}{{- $title = .Site.Title -}}{{- end -}}
+{{- $description := .Description -}}
+{{- if not $description -}}
+    {{- if .IsHome -}}
+        {{- $description = .Site.Params.description -}}
+    {{- else if .IsPage -}}
+        {{- $description = .Plain | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace | truncate 140 -}}
+    {{- else -}}
+        {{- $description = printf "%s：瀏覽謝科比的大雜把園地中相關文章與專題。" .Title -}}
+    {{- end -}}
+{{- end -}}
+{{- $description = $description | plainify | htmlUnescape | replaceRE `\s+` " " | strings.TrimSpace -}}
+<link rel="canonical" href="{{ $url }}">
+<meta name="description" content="{{ $description }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:url" content="{{ $url }}">
+<meta property="og:site_name" content="{{ .Site.Title }}">
+<meta property="og:locale" content="zh_TW">
+{{- $isArticle := and .IsPage (eq .Section "posts") -}}
+<meta property="og:type" content="{{ if $isArticle }}article{{ else }}website{{ end }}">
+<meta name="twitter:card" content="summary">
+{{- if .Params.noindex }}
+<meta name="robots" content="noindex, follow">
+{{- end }}
+{{- with .Site.Params.googleSiteVerification }}
+<meta name="google-site-verification" content="{{ . }}">
+{{- end -}}
+{{- if $isArticle -}}
+    {{- $article := dict "@context" "https://schema.org" "@type" "BlogPosting" "headline" .Title "description" $description "url" $url "mainEntityOfPage" (dict "@type" "WebPage" "@id" $url) "inLanguage" "zh-TW" -}}
+    {{- if not .Date.IsZero -}}
+        {{- $article = merge $article (dict "datePublished" (.Date.Format "2006-01-02T15:04:05Z07:00")) -}}
+    {{- end -}}
+    {{- if not .Lastmod.IsZero -}}
+        {{- $article = merge $article (dict "dateModified" (.Lastmod.Format "2006-01-02T15:04:05Z07:00")) -}}
+    {{- end -}}
+    {{- with .Params.author -}}
+        {{- if reflect.IsString . -}}
+            {{- $article = merge $article (dict "author" (dict "@type" "Person" "name" .)) -}}
+        {{- end -}}
+    {{- else -}}
+        {{- if and (not .Params.byline) (not .Params.legacy_archive) (not (strings.Contains .File.Path "takeout/")) -}}
+            {{- $article = merge $article (dict "author" (dict "@type" "Person" "name" .Site.Params.siteAuthor "url" (partial "public-url.html" "/about/"))) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- with .Params.cover -}}
+        {{- $cover := strings.TrimPrefix "/kirby1215/" . -}}
+        {{- $article = merge $article (dict "image" (slice (partial "public-url.html" $cover))) -}}
+    {{- end -}}
+<script type="application/ld+json">{{ $article | jsonify | safeJS }}</script>
+{{- end -}}

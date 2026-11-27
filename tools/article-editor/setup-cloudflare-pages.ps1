@@ -32,7 +32,7 @@ $steps.Text = @"
 
 4. 建置設定請填：
    Production branch：main
-   Build command：hugo --gc --minify -b `$CF_PAGES_URL
+   Build command：hugo --gc --minify
    Build output directory：public
    Root directory：留白
 
@@ -50,7 +50,7 @@ $copy.Location = New-Object Drawing.Point(24, 450)
 $copy.Size = New-Object Drawing.Size(205, 45)
 $copy.Text = "複製建置指令"
 $copy.Add_Click({
-    [Windows.Forms.Clipboard]::SetText('hugo --gc --minify -b $CF_PAGES_URL')
+    [Windows.Forms.Clipboard]::SetText('hugo --gc --minify')
     [Windows.Forms.MessageBox]::Show("已複製建置指令。", "完成", "OK", "Information") | Out-Null
 })
 $form.Controls.Add($copy)

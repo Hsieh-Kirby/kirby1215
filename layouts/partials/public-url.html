@@ -1,0 +1,7 @@
+{{- $base := strings.TrimSuffix "/" site.Params.publicBaseURL -}}
+{{- $path := printf "%s" . -}}
+{{- $url := $path -}}
+{{- if not (or (strings.HasPrefix $path "https://") (strings.HasPrefix $path "http://")) -}}
+    {{- $url = printf "%s/%s" $base (strings.TrimPrefix "/" $path) -}}
+{{- end -}}
+{{- return $url -}}

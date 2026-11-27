@@ -3,11 +3,16 @@ languageCode = 'zh-TW'
 title = '謝科比的大雜把園地'
 defaultContentLanguage = 'zh-tw'
 timeZone = 'Asia/Taipei'
+enableRobotsTXT = true
 
 [markup.goldmark.renderer]
 unsafe = true
 
 [params]
+publicBaseURL = 'https://kirby1215.tw/'
+description = '謝科比分享生活觀察、閱讀與哲學思考、古典音樂欣賞、日本經驗及天理教相關文章與翻譯。'
+siteAuthor = '謝科比'
+googleSiteVerification = 'jIgpIO8_WF5Z1KW_oNL7Oor-7SewOoC80t3sEYY-iOw'
 subtitle = '「智慧主要是一種比例感，更常見的是對我們人類局限性的認識。」—林語堂'
 goatcounterCode = 'kyhsieh'
 
